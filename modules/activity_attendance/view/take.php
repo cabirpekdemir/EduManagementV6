@@ -1,93 +1,79 @@
-<h2>Etkinlik Yoklama Girişi</h2>
-<p>
-    <strong>Etkinlik:</strong> <?= e($activity['title']) ?><br>
-    <strong>Tarih:</strong> <?= e(date('d.m.Y', strtotime($activity['activity_date']))) ?>
-</p>
-<a href="index.php?module=activity_attendance&action=index" class="btn" style="margin-bottom:15px;">&laquo; Etkinlik Seçim Ekranına Dön</a>
-<?php if (isset($_GET['status']) && $_GET['status'] === 'saved'): ?>
-    <p style="color: green; border:1px solid green; padding:10px;">Yoklama başarıyla kaydedildi.</p>
-<?php endif; ?>
+<?php
+if (!function_exists('h')) { function h($v){ return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-8'); } }
+$activities = $activities ?? [];
+$students   = $students ?? [];
+$classes    = $classes ?? [];
+$action     = $formAction ?? 'index.php?module=activity_attendance&action=store_take';
+$today      = $today ?? date('Y-m-d');
+?>
+<div class="card shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Yoklama Al</h5>
+    <a href="index.php?module=activity_attendance&action=index" class="btn btn-outline-secondary btn-sm">&larr; Liste</a>
+  </div>
+  <div class="card-body">
+    <form action="<?= h($action) ?>" method="post">
+      <div class="row g-3 mb-3">
+        <div class="col-md-4">
+          <label class="form-label">Etkinlik</label>
+          <select name="activity_id" class="form-select" required>
+            <option value="">Seçiniz…</option>
+            <?php foreach ($activities as $a): ?>
+              <option value="<?= (int)$a['id'] ?>"><?= h($a['title'] ?? ('#'.$a['id'])) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Tarih</label>
+          <input type="date" name="attendance_date" class="form-control" value="<?= h($today) ?>" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Sınıf (opsiyonel)</label>
+          <select name="class_id" class="form-select">
+            <option value="">—</option>
+            <?php foreach ($classes as $c): ?>
+              <option value="<?= (int)$c['id'] ?>"><?= h($c['name']) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+      </div>
 
-<form method="POST" action="index.php?module=activity_attendance&action=save">
-    <input type="hidden" name="activity_id" value="<?= e($activity['id']) ?>">
-    <table border="1" cellpadding="6" cellspacing="0" style="width:100%">
-        <thead>
-            <tr>
-                <th style="width:50%">Öğrenci Adı</th>
-                <th style="width:35%">Durum</th>
-                <th style="width:15%">Notlar</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if(!empty($students)): ?>
-                <?php foreach($students as $student): ?>
-                    <input type="hidden" name="students[<?= e($student['id']) ?>]" value="1">
-                    <tr>
-                        <td><?= e($student['name']) ?> (Sınıfı: <?= e($student['class_name'] ?? 'N/A') ?>)</td>
-                        <td>
-                            <div class="attendance-status-buttons">
-                                <?php 
-                                $current_status = $attendance_map[$student['id']]['status'] ?? 'Geldi'; 
-                                foreach($statuses as $status_val): 
-                                    $is_checked = ($current_status === $status_val);
-                                ?>
-                                <label class="status-button <?= $is_checked ? 'active' : '' ?>" data-status="<?= e($status_val) ?>">
-                                    <input type="radio" name="status[<?= e($student['id']) ?>]" value="<?= e($status_val) ?>" <?= $is_checked ? 'checked' : '' ?> style="display:none;">
-                                    <?= e($status_val) ?>
-                                </label>
-                                <?php endforeach; ?>
-                            </div>
-                        </td>
-                        <td><input type="text" name="notes[<?= e($student['id']) ?>]" value="<?= e($attendance_map[$student['id']]['notes'] ?? '') ?>" style="width:95%;"></td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr><td colspan="3">Bu etkinliğe atanmış öğrenci bulunamadı.</td></tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
-    <?php if(!empty($students)): ?>
-    <div style="margin-top:20px;">
-        <button type="button" class="btn" id="markAllPresentBtn">Tümünü Geldi İşaretle</button>
-        <button type="submit" class="btn" style="background-color: #5cb85c; margin-left:10px;">Yoklamayı Kaydet</button>
-    </div>
-    <?php endif; ?>
-</form>
-<style>
-    .attendance-status-buttons label.status-button { display: inline-block; padding: 6px 10px; margin: 2px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background-color: #f8f8f8; transition: all 0.2s; font-size:0.9em;}
-    .attendance-status-buttons label.status-button:hover { background-color: #e9e9e9; }
-    .attendance-status-buttons label.status-button.active { color: white; border-color: #2e6da4; }
-    .attendance-status-buttons label.status-button[data-status="Geldi"].active { background-color: #5cb85c; border-color: #4cae4c;}
-    .attendance-status-buttons label.status-button[data-status="Gelmedi"].active { background-color: #d9534f; border-color: #d43f3a;}
-    .attendance-status-buttons label.status-button[data-status="İzinli"].active { background-color: #5bc0de; border-color: #46b8da;}
-</style>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.attendance-status-buttons').forEach(container => {
-        const buttons = container.querySelectorAll('.status-button');
-        buttons.forEach(label => {
-            label.addEventListener('click', function() {
-                container.querySelectorAll('.status-button').forEach(btn => btn.classList.remove('active'));
-                this.classList.add('active');
-                this.querySelector('input[type="radio"]').checked = true;
-            });
-        });
-    });
-    const markAllPresentButton = document.getElementById('markAllPresentBtn');
-    if(markAllPresentButton){
-        markAllPresentButton.addEventListener('click', function(){
-            document.querySelectorAll('.attendance-status-buttons').forEach(container => {
-                container.querySelectorAll('.status-button').forEach(btnLabel => {
-                    btnLabel.classList.remove('active');
-                    const radio = btnLabel.querySelector('input[type="radio"]');
-                    if(radio) radio.checked = false;
-                    if(btnLabel.dataset.status === 'Geldi'){ 
-                        btnLabel.classList.add('active');
-                        if(radio) radio.checked = true;
-                    }
-                });
-            });
-        });
-    }
-});
-</script>
+      <?php if (empty($students)): ?>
+        <div class="text-muted">Öğrenci bulunamadı.</div>
+      <?php else: ?>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th style="width:4%"><input type="checkbox" onclick="document.querySelectorAll('.chk-stu').forEach(c=>c.checked=this.checked)"></th>
+                <th>Öğrenci</th>
+                <th style="width:22%">Durum</th>
+                <th style="width:30%">Not</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($students as $s): $sid=(int)$s['id']; ?>
+                <tr>
+                  <td><input type="checkbox" class="chk-stu" name="student_id[]" value="<?= $sid ?>"></td>
+                  <td><?= h($s['name'] ?? ('#'.$sid)) ?></td>
+                  <td>
+                    <select name="status[<?= $sid ?>]" class="form-select form-select-sm">
+                      <option value="Geldi">Geldi</option>
+                      <option value="Gelmedi">Gelmedi</option>
+                      <option value="İzinli">İzinli</option>
+                    </select>
+                  </td>
+                  <td><input type="text" name="notes[<?= $sid ?>]" class="form-control form-control-sm" placeholder="Not (opsiyonel)"></td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="text-end">
+          <button type="submit" class="btn btn-primary">Kaydet</button>
+        </div>
+      <?php endif; ?>
+    </form>
+  </div>
+</div>

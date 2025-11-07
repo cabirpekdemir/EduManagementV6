@@ -1,0 +1,500 @@
+{
+    "project": "Bilim Merkezi Yönetim Sistemi",
+    "version": "1.0",
+    "last_updated": "2025-11-05",
+    "statistics": {
+        "total_tasks": 67,
+        "completed": 11,
+        "in_progress": 5,
+        "todo": 51,
+        "completion_rate": 16.4
+    },
+    "categories": {
+        "ogrenciler": {
+            "id": "ogrenciler",
+            "name": "👨‍🎓 Öğrenciler Modülü",
+            "color": "#3b82f6",
+            "icon": "fa-user-graduate",
+            "tasks": [
+                {
+                    "id": "ogr-001",
+                    "title": "Doğum Tarihi Başlık Kolonu",
+                    "description": "Öğrenci listesinde başlık kısmında doğum tarihi kolonu eklensin (isim benzerliği durumlarında)",
+                    "priority": "medium",
+                    "status": "completed",
+                    "completed_date": "2025-11-04",
+                    "category": "Liste Görünümü",
+                    "date": "2025-11-05"
+                },
+                {
+                    "id": "ogr-002",
+                    "title": "Gelişmiş Filtreleme Sistemi",
+                    "description": "Liste filtreleme: Durum, Sınıf, Telefon, Ad Soyad, TC Kimlik, Öğretim Türü",
+                    "priority": "high",
+                    "status": "completed",
+                    "completed_date": "2025-11-04",
+                    "category": "Liste Görünümü"
+                },
+                {
+                    "id": "ogr-003",
+                    "title": "Sıralama Özellikleri",
+                    "description": "Tüm kolonlara göre sıralama yapılabilsin (Ad Soyad alfabetik, Doğum Tarihi vs.)",
+                    "priority": "medium",
+                    "status": "completed",
+                    "completed_date": "2025-11-04",
+                    "category": "Liste Görünümü"
+                },
+                {
+                    "id": "ogr-004",
+                    "title": "Admin Kullanıcı Gözüyle Gör Butonu",
+                    "description": "Admin, öğretmen\/öğrenci\/veli olarak sistemi görebilsin",
+                    "priority": "medium",
+                    "status": "completed",
+                    "completed_date": "2025-11-03",
+                    "category": "Yetkilendirme"
+                },
+                {
+                    "id": "ogr-005",
+                    "title": "Zorunlu Alanlar Güncelleme",
+                    "description": "Zorunlu: Ad-Soyad, Tel1, Okul Adı, Doğum Tarihi, TC Kimlik, Cinsiyet, Anne Adı, Sınıf (Kademe)",
+                    "priority": "high",
+                    "status": "in-progress",
+                    "category": "Form Validasyonu"
+                },
+                {
+                    "id": "ogr-006",
+                    "title": "Kamera ile Fotoğraf Çekme",
+                    "description": "Yeni öğrenci eklerken PC kamerası ile fotoğraf çekilebilsin",
+                    "priority": "high",
+                    "status": "completed",
+                    "completed_date": "2025-11-04",
+                    "category": "Fotoğraf Yönetimi",
+                    "date": "2025-11-05"
+                },
+                {
+                    "id": "ogr-007",
+                    "title": "Form Input Boyutları Optimizasyonu",
+                    "description": "TC Kimlik (11 hane), Sınıf gibi kutucuklar gereksiz uzun - kısaltılacak",
+                    "priority": "low",
+                    "status": "todo",
+                    "category": "UI\/UX"
+                },
+                {
+                    "id": "ogr-008",
+                    "title": "Telefon Formatı",
+                    "description": "Telefon numarası: (538) 470 12 53 formatında otomatik",
+                    "priority": "medium",
+                    "status": "completed",
+                    "completed_date": "2025-11-04",
+                    "category": "Form Validasyonu",
+                    "date": "2025-11-05"
+                },
+                {
+                    "id": "ogr-009",
+                    "title": "Profil Bilgileri Blok Blok Düzenleme",
+                    "description": "Bilgiler dağınık, blok blok görünsün: 1. TC\/Doğum\/Doğum Yeri, 2. Telefonlar, 3. Anne\/Baba\/Adres\/Mail",
+                    "priority": "high",
+                    "status": "completed",
+                    "completed_date": "2025-11-03",
+                    "category": "Profil Görünümü"
+                },
+                {
+                    "id": "ogr-010",
+                    "title": "Öğretmen Notu Görünürlüğü",
+                    "description": "Öğretmen notu öğrenci profilinde görünmüyor, düzeltilecek",
+                    "priority": "high",
+                    "status": "todo",
+                    "category": "Profil Görünümü"
+                },
+                {
+                    "id": "ogr-011",
+                    "title": "Ders Kaydı Butonu",
+                    "description": "Üst sekmede Ders Kaydı butonu olsun, buradan uygun dersleri seçebilsin",
+                    "priority": "high",
+                    "status": "todo",
+                    "category": "Profil Görünümü"
+                },
+                {
+                    "id": "ogr-012",
+                    "title": "Sağlık Bilgisi Ekleme\/Düzenleme",
+                    "description": "Öğrenci profil kartında sağlık bilgisi eklemesi\/düzenlemesi yapılabilsin",
+                    "priority": "high",
+                    "status": "in-progress",
+                    "category": "Sağlık Bilgileri"
+                },
+                {
+                    "id": "ogr-013",
+                    "title": "Durum Değiştir Butonu",
+                    "description": "Profilde durum değiştirme: Ders Seçimi, Kayıt Dondurma, Sınav Seçimi, Mezun, Arşiv vs.",
+                    "priority": "high",
+                    "status": "todo",
+                    "category": "Durum Yönetimi"
+                },
+                {
+                    "id": "ogr-014",
+                    "title": "Aldığı Dersler - Detaylı Bilgi",
+                    "description": "Aldığı derslerde: Dönem, Yıl, Gün, Saat bilgileri görünsün",
+                    "priority": "medium",
+                    "status": "completed",
+                    "completed_date": "2025-11-05",
+                    "category": "Ders Yönetimi"
+                },
+                {
+                    "id": "ogr-015",
+                    "title": "Devamsızlık - Ders Bazlı ve Toplam",
+                    "description": "Devamsızlık bilgisi ders bazlı ve toplam olarak, dönem bazında geçmiş verilerle görünsün",
+                    "priority": "medium",
+                    "status": "in-progress",
+                    "category": "Devamsızlık"
+                },
+                {
+                    "id": "ogr-016",
+                    "title": "Liste Kolonları Düzenleme",
+                    "description": "TC, Okul Bilgisi, Doğum Tarihi listede görünmeli. E-posta ve Öğrenci No kaldırılacak",
+                    "priority": "medium",
+                    "status": "todo",
+                    "category": "Liste Görünümü"
+                },
+                {
+                    "id": "ogr-017",
+                    "title": "Sınıf (Kademe) Kolonu",
+                    "description": "Öğrenci listesinde ve düzenleme sayfasında sınıf (kademe) görünsün ve düzenlenebilsin",
+                    "priority": "high",
+                    "status": "todo",
+                    "category": "Liste Görünümü"
+                },
+                {
+                    "id": "ogr-018",
+                    "title": "Mezuniyet İlerlemesi Göstergesi",
+                    "description": "Öğrenci listesinde kutucuklar - aldığı ders kadar yeşil görünsün. Sıralama yapılabilsin",
+                    "priority": "medium",
+                    "status": "todo",
+                    "category": "İlerleme Takibi"
+                },
+                {
+                    "id": "ogr-019",
+                    "title": "Filtreleme Alanı Daraltma",
+                    "description": "Filtreleme kısmı çok geniş, tek kutucuğa isim\/tc\/telefon yazınca bulsun",
+                    "priority": "low",
+                    "status": "todo",
+                    "category": "UI\/UX"
+                },
+                {
+                    "id": "ogr-020",
+                    "title": "TKT Sınav Sonuçları Düzenleme",
+                    "description": "İlkokul: Dil, Şekil Uzay, Akıl Yürütme, Ayırt Etme, Sayısal, Genel | Ortaokul: Dil, Sayısal, Akıl Yürütme, Genel",
+                    "priority": "high",
+                    "status": "todo",
+                    "category": "Sınav Sonuçları"
+                },
+                {
+                    "id": "ogr-021",
+                    "title": "Ön Test ve Son Test - Atölye Bazlı",
+                    "description": "Atölyeler: Astronomi, Akıl ve Zeka Oyunları, Fen, Dil Sanatları, Düşünme Becerileri, Robotik Kodlama, Drama, Matematik",
+                    "priority": "high",
+                    "status": "todo",
+                    "category": "Sınav Sonuçları"
+                },
+                {
+                    "id": "ogr-022",
+                    "title": "TKD Sınavları Bölümü Kaldırma",
+                    "description": "TKD (Temel Kavram Değerlendirme) Sınavları bölümü silinecek",
+                    "priority": "low",
+                    "status": "todo",
+                    "category": "Sınav Sonuçları"
+                },
+                {
+                    "id": "ogr-023",
+                    "title": "Sınav Tarihi Gösterimi",
+                    "description": "Öğrencinin sınava girdiği tarih görünsün",
+                    "priority": "medium",
+                    "status": "todo",
+                    "category": "Sınav Sonuçları"
+                },
+                {
+                    "id": "ogr-024",
+                    "title": "Sınav Sonuçları Sekmesi",
+                    "description": "Profilde Sınav Sonuçları butonu - TKT, Ön-Son Test ayrı ayrı görünsün",
+                    "priority": "medium",
+                    "status": "todo",
+                    "category": "Sınav Sonuçları"
+                },
+                {
+                    "id": "ogr-025",
+                    "title": "Transkript PDF Görüntüleme",
+                    "description": "Öğrenci profilinde transkript PDF halinde görünsün",
+                    "priority": "medium",
+                    "status": "completed",
+                    "category": "Raporlama",
+                    "date": "2025-11-05"
+                }
+            ]
+        },
+        "degerlendirmeler": {
+            "id": "degerlendirmeler",
+            "name": "📊 Değerlendirmeler",
+            "color": "#8b5cf6",
+            "icon": "fa-chart-line",
+            "tasks": [
+                {
+                    "id": "deg-001",
+                    "title": "İlkokul - Ortaokul Ayrımı",
+                    "description": "İlgili sınıf kısmında ilkokul ve ortaokul diye ayrılsın",
+                    "priority": "high",
+                    "status": "todo",
+                    "category": "Filtreleme"
+                },
+                {
+                    "id": "deg-002",
+                    "title": "Saat Ekleme",
+                    "description": "Tarih kutucuğunun yanında saat de eklensin",
+                    "priority": "medium",
+                    "status": "todo",
+                    "category": "Form"
+                },
+                {
+                    "id": "deg-003",
+                    "title": "Yazılı Sınav - Değerlendirme Alanları",
+                    "description": "Dil, Şekil Uzay, Ayırt Etme, Sayısal, Akıl Yürütme, Genel - sadece sayısal veri girişi",
+                    "priority": "high",
+                    "status": "todo",
+                    "category": "Form"
+                },
+                {
+                    "id": "deg-004",
+                    "title": "Öğrenci Durum Filtreleme",
+                    "description": "Öğrencilerin durumuna göre direkt sınav ataması yapılabilsin",
+                    "priority": "medium",
+                    "status": "todo",
+                    "category": "Atama"
+                },
+                {
+                    "id": "deg-005",
+                    "title": "Toplu Sınıf Bazlı Atama",
+                    "description": "Sınıf seviyesine göre toplu atama (örn: 4. sınıftan 5. sınıfa geçenler)",
+                    "priority": "high",
+                    "status": "todo",
+                    "category": "Atama"
+                }
+            ]
+        },
+        "dersler": {
+            "id": "dersler",
+            "name": "📚 Dersler",
+            "color": "#10b981",
+            "icon": "fa-book",
+            "tasks": [
+                {
+                    "id": "ders-001",
+                    "title": "Ders Programı Ekleme Hatası",
+                    "description": "Ders programı eklerken hata veriyor - düzeltilecek",
+                    "priority": "critical",
+                    "status": "todo",
+                    "category": "Bug Fix"
+                },
+                {
+                    "id": "ders-002",
+                    "title": "Kredi Butonu Kaldırma",
+                    "description": "Kredi butonu kaldırılacak - tüm dersler eşit",
+                    "priority": "low",
+                    "status": "todo",
+                    "category": "UI Temizleme"
+                },
+                {
+                    "id": "ders-003",
+                    "title": "Sınıf\/Atölye Alanı Kaldırma",
+                    "description": "Ders Programı ekle başlığı altında Sınıf\/Atölye kaldırılabilir",
+                    "priority": "low",
+                    "status": "todo",
+                    "category": "UI Temizleme"
+                }
+            ]
+        },
+        "yoklama": {
+            "id": "yoklama",
+            "name": "✅ Yoklama",
+            "color": "#f59e0b",
+            "icon": "fa-calendar-check",
+            "tasks": [
+                {
+                    "id": "yok-001",
+                    "title": "Admin\/Yönetici - Tüm Dersler Görünürlüğü",
+                    "description": "Admin\/Yönetici için dönemdeki tüm dersler görünsün (tarih seçimi olmadan)",
+                    "priority": "high",
+                    "status": "todo",
+                    "category": "Yetkilendirme"
+                },
+                {
+                    "id": "yok-002",
+                    "title": "Öğretmen Sadece Kendi Derslerini Görsün",
+                    "description": "Öğretmen ekranında sadece öğretmenin dersleri görünsün",
+                    "priority": "high",
+                    "status": "todo",
+                    "category": "Yetkilendirme"
+                },
+                {
+                    "id": "yok-003",
+                    "title": "İzinli Kısmı Yetki Kısıtlaması",
+                    "description": "İzinli sadece yönetim, danışma ve rehberlikte kalacak - öğretmenlerden kaldırılacak",
+                    "priority": "medium",
+                    "status": "todo",
+                    "category": "Yetkilendirme"
+                },
+                {
+                    "id": "yok-004",
+                    "title": "Buton Sadeleştirme",
+                    "description": "Not ve geldi-gelmedi butonları kaldırılacak, sadece tik ve çarpı kalacak",
+                    "priority": "medium",
+                    "status": "todo",
+                    "category": "UI Sadeleştirme"
+                },
+                {
+                    "id": "yok-005",
+                    "title": "Yoklama Düzenleme",
+                    "description": "Yoklama aldığımız ekranda düzenlenebilsin",
+                    "priority": "medium",
+                    "status": "todo",
+                    "category": "İşlevsellik"
+                },
+                {
+                    "id": "yok-006",
+                    "title": "Değerlendirme Yoklaması Kaldırma",
+                    "description": "Öğretmen ekranında değerlendirme yoklaması kaldırılacak",
+                    "priority": "low",
+                    "status": "todo",
+                    "category": "UI Temizleme"
+                }
+            ]
+        },
+        "anasayfa": {
+            "id": "anasayfa",
+            "name": "🏠 Anasayfa & Dashboard",
+            "color": "#ef4444",
+            "icon": "fa-home",
+            "tasks": [
+                {
+                    "id": "ana-001",
+                    "title": "Randevu Yönetimi Yetki Kısıtlaması",
+                    "description": "Randevu yönetimi sadece Yönetim ve Sena'da görünsün, diğer öğretmenlerden kaldırılsın",
+                    "priority": "high",
+                    "status": "todo",
+                    "category": "Yetkilendirme"
+                },
+                {
+                    "id": "ana-002",
+                    "title": "Ana Panel Butonları Çalışmıyor",
+                    "description": "Ana panelde bulunan butonlar çalışmıyor - düzeltilecek",
+                    "priority": "critical",
+                    "status": "todo",
+                    "category": "Bug Fix"
+                },
+                {
+                    "id": "ana-003",
+                    "title": "Dashboard Kartları Güncelleme",
+                    "description": "Toplam Öğrenci, Dönem Öğrencileri, Ders Programı görünsün",
+                    "priority": "medium",
+                    "status": "completed",
+                    "category": "Dashboard",
+                    "date": "2025-11-05"
+                },
+                {
+                    "id": "ana-004",
+                    "title": "Hızlı Aksiyonlar Bölümü",
+                    "description": "Ders Yoklaması, Sınav Girişi, Ders Seçimi (sadece ders seçiminde olan öğrenciler)",
+                    "priority": "medium",
+                    "status": "todo",
+                    "category": "Dashboard"
+                },
+                {
+                    "id": "ana-005",
+                    "title": "Bugünkü Ders Yoklamalarım Kaldırma",
+                    "description": "Bugünkü Ders Yoklamalarım bölümü kaldırılacak",
+                    "priority": "low",
+                    "status": "todo",
+                    "category": "UI Temizleme"
+                }
+            ]
+        },
+        "performans": {
+            "id": "performans",
+            "name": "⚡ Performans & Genel",
+            "color": "#6366f1",
+            "icon": "fa-rocket",
+            "tasks": [
+                {
+                    "id": "perf-001",
+                    "title": "Sistem Hız Optimizasyonu",
+                    "description": "Sistem butona tıkladıktan sonra genel olarak ağır çalışıyor - optimize edilecek",
+                    "priority": "critical",
+                    "status": "in-progress",
+                    "category": "Performans"
+                },
+                {
+                    "id": "perf-002",
+                    "title": "Sayfa Kaydırma Problemi",
+                    "description": "Sekme butonlarına tıkladıktan sonra sayfa aşağıya kayıyor - düzeltilecek",
+                    "priority": "medium",
+                    "status": "todo",
+                    "category": "UI\/UX"
+                }
+            ]
+        },
+        "etkinlik": {
+            "id": "etkinlik",
+            "name": "🎉 Etkinlik Yönetimi",
+            "color": "#ec4899",
+            "icon": "fa-calendar-alt",
+            "tasks": [
+                {
+                    "id": "etk-001",
+                    "title": "Etkinlik Ekleme Özellikleri",
+                    "description": "İstenen özellikler tamamlandı",
+                    "priority": "high",
+                    "status": "completed",
+                    "completed_date": "2025-11-01",
+                    "category": "Geliştirme",
+                    "date": "2025-11-05"
+                }
+            ]
+        }
+    },
+    "priority_definitions": {
+        "critical": {
+            "emoji": "🔴",
+            "label": "Kritik",
+            "description": "Acilen çözülmesi gereken, sistemin kullanılabilirliğini etkileyen sorunlar"
+        },
+        "high": {
+            "emoji": "🟠",
+            "label": "Yüksek",
+            "description": "Önemli özellikler ve kullanıcı deneyimini doğrudan etkileyen geliştirmeler"
+        },
+        "medium": {
+            "emoji": "🟡",
+            "label": "Orta",
+            "description": "İyileştirmeler ve orta öncelikli özellikler"
+        },
+        "low": {
+            "emoji": "🟢",
+            "label": "Düşük",
+            "description": "UI temizleme, küçük iyileştirmeler ve estetik değişiklikler"
+        }
+    },
+    "status_definitions": {
+        "completed": {
+            "emoji": "✅",
+            "label": "Tamamlandı",
+            "description": "Başarıyla tamamlanmış ve test edilmiş"
+        },
+        "in-progress": {
+            "emoji": "🔄",
+            "label": "Devam Ediyor",
+            "description": "Şu anda üzerinde çalışılıyor"
+        },
+        "todo": {
+            "emoji": "📝",
+            "label": "Yapılacak",
+            "description": "Henüz başlanmamış görevler"
+        }
+    }
+}

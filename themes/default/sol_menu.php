@@ -1,93 +1,163 @@
 <?php
-if (file_exists(__DIR__ . '/../../core/database.php')) {
-    require_once __DIR__ . '/../../core/database.php';
-}
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
+/**
+ * sol_menu.php
+ * - FA 4.7 ikon uyumu
+ * - menu_roles tablosuna göre rol bazlı görünürlük
+ * - Görünür alt menünün ebeveynini de otomatik ekler (taşıyıcı)
+ * - Akordeon: aynı seviyede tek açık; durum localStorage ile saklanır
+ */
+
+if (session_status() === PHP_SESSION_NONE) @session_start();
+
+function sm_h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
+
+/** FA 4.7 için ikon sınıfını normalize et */
+function normalize_icon_fa47(?string $icon): string {
+  $i = trim((string)$icon);
+  if ($i === '' || $i === '#' || $i === '-') return 'fa fa-circle';
+  // FA5/6 sınıf öneklerini FA4'e indir
+  $i = preg_replace('/\b(fas|far|fal|fab)\s+/', 'fa ', $i);
+  // Başta 'fa ' yoksa ekle
+  if (strpos($i, 'fa ') !== 0) $i = 'fa ' . ltrim($i);
+  // Çift boşlukları tekleyelim
+  $i = preg_replace('/\s+/', ' ', $i);
+  return $i;
 }
 
 try {
-    $db = Database::getInstance();
-    $role = $_SESSION['user']['role'] ?? 'guest';
-    $request_uri = $_SERVER['REQUEST_URI'] ?? '';
+  // DB
+  if (!class_exists('Database')) require_once __DIR__ . '/../core/database.php';
+  $pdo = Database::getInstance()->getConnection();
 
-    $sql = "SELECT m.id, m.parent_id, m.title, m.url, m.icon FROM menus m INNER JOIN menu_roles mr ON m.id = mr.menu_id WHERE m.is_active = 1 AND LOWER(mr.role) = LOWER(?) ORDER BY m.parent_id, m.display_order ASC";
-    $all_items = $db->select($sql, [$role]);
+  // Aktif oturum ve rol
+  $roleName = $_SESSION['user']['role'] ?? $_SESSION['role'] ?? null;     // 'admin'|'teacher'|'student'|'parent'
+  $roleId   = $_SESSION['user']['role_id'] ?? $_SESSION['role_id'] ?? null;
 
-    $menu_tree = [];
-    if (!empty($all_items)) {
-        $items_by_id = [];
-        foreach ($all_items as $item) {
-            $items_by_id[$item['id']] = $item;
-            $items_by_id[$item['id']]['children'] = [];
-        }
-        foreach ($items_by_id as $id => &$item) {
-            if ($item['parent_id'] != 0 && isset($items_by_id[$item['parent_id']])) {
-                $items_by_id[$item['parent_id']]['children'][] = &$item;
-            }
-        }
-        unset($item);
-        foreach ($items_by_id as $id => $item) {
-            if ($item['parent_id'] == 0) {
-                $menu_tree[] = $item;
-            }
-        }
+  // Misafir ise menüyü hiç göstermeyelim (istersen küçük bir giriş linki koyabilirsin)
+  $isGuest = empty($_SESSION['user']['id']) && empty($_SESSION['user_id']) && !$roleName;
+  if ($isGuest) { echo '<!-- sidebar hidden for guests -->'; return; }
+
+  // 1) Rol filtreli menüleri çek
+  // Kural:
+  //  - Eğer bir menünün menu_roles’ta kaydı varsa, SADECE o roller görür.
+  //  - Eğer hiç kaydı yoksa, HERKESE görünür (geriye dönük uyum).
+  $params = [];
+  $sql = "
+    SELECT m.id, COALESCE(m.parent_id,0) AS parent_id, m.title, m.url, m.icon,
+           COALESCE(m.display_order,0) AS display_order, COALESCE(m.is_active,1) AS is_active
+    FROM menus m
+    WHERE COALESCE(m.is_active,1) = 1
+      AND (
+        NOT EXISTS (SELECT 1 FROM menu_roles r WHERE r.menu_id = m.id)
+        OR EXISTS (SELECT 1 FROM menu_roles r2 WHERE r2.menu_id = m.id AND r2.role = :roleName)
+      )
+    ORDER BY COALESCE(m.parent_id,0), COALESCE(m.display_order,0), m.id
+  ";
+  $params[':roleName'] = (string)$roleName;
+  $st = $pdo->prepare($sql);
+  $st->execute($params);
+  $rows = $st->fetchAll(PDO::FETCH_ASSOC);
+
+  // 2) Görünür alt menüler varsa ebeveyn(ler) taşıyıcı olarak eklensin
+  $byId = [];
+  foreach ($rows as $r) { $byId[(int)$r['id']] = $r; }
+
+  $missingParentIds = [];
+  foreach ($rows as $r) {
+    $pid = (int)$r['parent_id'];
+    if ($pid !== 0 && !isset($byId[$pid])) $missingParentIds[$pid] = true;
+  }
+  if ($missingParentIds) {
+    $ids = array_keys($missingParentIds);
+    // Güvenli IN
+    $in = implode(',', array_fill(0, count($ids), '?'));
+    $st2 = $pdo->prepare("
+      SELECT id, COALESCE(parent_id,0) AS parent_id, title, url, icon,
+             COALESCE(display_order,0) AS display_order, COALESCE(is_active,1) AS is_active
+      FROM menus
+      WHERE id IN ($in)
+      ORDER BY COALESCE(parent_id,0), COALESCE(display_order,0), id
+    ");
+    $st2->execute($ids);
+    $parents = $st2->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($parents as $p) {
+      $byId[(int)$p['id']] = $p; // taşıyıcı olarak ekle (bu kayıtta rol kısıtı aranmaz)
     }
+  }
 
-    if (!function_exists('draw_menu_items_final')) {
-        function draw_menu_items_final($items, $current_uri) {
-            $is_any_child_in_this_branch_active = false;
-            foreach ($items as $item) {
-                $has_children = !empty($item['children']);
-                
-                parse_str(parse_url($current_uri, PHP_URL_QUERY) ?? '', $current_query_params);
-                parse_str(parse_url($item['url'], PHP_URL_QUERY) ?? '', $item_query_params);
-                $is_current_item_active = (($current_query_params['module'] ?? '') === ($item_query_params['module'] ?? null));
+  // 3) Ağaç kur
+  // Önce index’li dizi
+  $nodes = array_values($byId);
+  usort($nodes, function($a,$b){
+    $c = ($a['parent_id'] <=> $b['parent_id']);
+    if ($c !== 0) return $c;
+    $d = ($a['display_order'] <=> $b['display_order']);
+    if ($d !== 0) return $d;
+    return ($a['id'] <=> $b['id']);
+  });
 
-                $children_html = '';
-                $is_a_child_active = false;
-                if ($has_children) {
-                    ob_start();
-                    $is_a_child_active = draw_menu_items_final($item['children'], $current_uri);
-                    $children_html = ob_get_clean();
-                }
-
-                $is_active = $is_current_item_active || $is_a_child_active;
-                $li_class = 'nav-item';
-                if ($has_children) $li_class .= ' has-treeview';
-                if ($is_active && $has_children) $li_class .= ' menu-open';
-                
-                $a_class = 'nav-link';
-                if ($is_active) $a_class .= ' active';
-                
-                echo "<li class='" . $li_class . "'>";
-                echo "<a href='" . htmlspecialchars($item['url']) . "' class='" . $a_class . "'>";
-                if (!empty($item['icon'])) {
-                    echo "<i class='nav-icon fa " . htmlspecialchars($item['icon']) . "'></i> ";
-                }
-                echo "<p>" . htmlspecialchars($item['title']);
-                if ($has_children) {
-                    echo "<i class='right fa fa-angle-left'></i>";
-                }
-                echo "</p></a>";
-                if ($has_children) {
-                    echo "<ul class='nav nav-treeview'>" . $children_html . "</ul>";
-                }
-                echo "</li>";
-
-                if ($is_active) $is_any_child_in_this_branch_active = true;
-            }
-            return $is_any_child_in_this_branch_active;
-        }
+  $map = [];
+  foreach ($nodes as $n) {
+    $n['children'] = [];
+    $map[(int)$n['id']] = $n;
+  }
+  foreach ($map as $id => $n) {
+    $pid = (int)$n['parent_id'];
+    if ($pid !== 0 && isset($map[$pid])) {
+      $map[$pid]['children'][] = &$map[$id];
     }
+  }
+  $tree = [];
+  foreach ($map as $id => $n) {
+    $pid = (int)$n['parent_id'];
+    if ($pid === 0 || !isset($map[$pid])) $tree[] = $n;
+  }
 
-    if (!empty($menu_tree)) {
-        draw_menu_items_final($menu_tree, $request_uri);
-    } elseif (isset($_SESSION['user'])) {
-        echo "<li class='nav-item'><a href='#' class='nav-link'><p>Bu rol için menü bulunamadı.</p></a></li>";
-    }
-} catch (Exception $e) {
-    error_log("Menu Error: " . $e->getMessage());
-    echo "<li class='nav-item'><a href='#' class='nav-link text-danger'><p>Menü yüklenemedi!</p></a></li>";
+} catch (\Throwable $e) {
+  // Hata durumunda fail-safe küçük bir menü göster
+  echo '<ul class="sidebar-menu"><li><a href="index.php"><i class="fa fa-home"></i> <span>Ana Sayfa</span></a></li></ul>';
+  return;
 }
+
+// === RENDER ===
 ?>
+<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+  <?php
+  // AdminLTE 3 için render fonksiyonu güncellendi
+  $render = function ($items) use (&$render) {
+    foreach ($items as $it) {
+      $hasChildren = !empty($it['children']);
+      // 'nav-icon' sınıfını ekliyoruz
+      $icon = 'nav-icon ' . normalize_icon_fa47($it['icon'] ?? ''); 
+      $url  = trim((string)($it['url'] ?? '#'));
+      $title = sm_h($it['title'] ?? '');
+
+      if ($hasChildren) {
+        // AdminLTE 3: 'nav-item has-treeview'
+        echo '<li class="nav-item has-treeview">';
+        // AdminLTE 3: 'nav-link'
+        echo '<a href="#" class="nav-link">';
+        echo '<i class="'.sm_h($icon).'"></i>';
+        // 'pull-right' yerine 'right' ve <p> etiketi
+        echo '<p>' . $title . '<i class="right fa fa-angle-left"></i></p>'; 
+        echo '</a>';
+        // AdminLTE 3: 'nav nav-treeview'
+        echo '<ul class="nav nav-treeview">';
+        $render($it['children']);
+        echo '</ul>';
+        echo '</li>';
+      } else {
+        // AdminLTE 3: 'nav-item'
+        echo '<li class="nav-item">';
+        // AdminLTE 3: 'nav-link'
+        echo '<a href="'.sm_h($url).'" class="nav-link">';
+        // İkon için <p> etiketi
+        echo '<i class="'.sm_h($icon).'"></i> <p>'.$title.'</p>';
+        echo '</a></li>';
+      }
+    }
+  };
+
+  $render($tree);
+  ?>
+</ul>

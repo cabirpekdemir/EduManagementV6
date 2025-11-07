@@ -15,13 +15,9 @@
 }
 
 /* --- 2. ADMİNLTE ÜZERİNE YAZMA (OVERRIDE) --- */
-body {
-    font-family: 'Roboto Condensed', sans-serif;
-}
+body { font-family: 'Roboto Condensed', sans-serif; }
 
-.main-sidebar {
-    background-color: var(--secondary-color) !important;
-}
+.main-sidebar { background-color: var(--secondary-color) !important; }
 
 /* Aktif veya üzerine gelinen menü elemanı için stil */
 .sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link.active,
@@ -31,13 +27,9 @@ body {
 }
 
 /* Alt menü arka plan rengi düzeltmesi */
-.nav-treeview {
-    background-color: var(--sidebar-submenu-bg) !important;
-}
+.nav-treeview { background-color: var(--sidebar-submenu-bg) !important; }
 
-.sidebar a {
-    color: var(--sidebar-text-color) !important;
-}
+.sidebar a { color: var(--sidebar-text-color) !important; }
 
 /* --- 3. ÜST BAR (HEADER) --- */
 .main-header {
@@ -76,3 +68,27 @@ body {
         color: var(--secondary-color);
     }
 }
+
+/* =============================== */
+/* 5) MENÜ – TAM SATIR TIKLANABİLİR */
+/* =============================== */
+
+.sidebar .menu-item .menu-link{
+  display:flex; align-items:center; gap:.6rem;
+  padding:.6rem .9rem; cursor:pointer; user-select:none; text-decoration:none;
+  color: var(--sidebar-text-color);
+}
+.sidebar .menu-item .menu-link:hover{ background: rgba(255,255,255,.06); }
+
+.sidebar .menu-item .menu-icon{ width:1.25rem; display:inline-flex; justify-content:center; }
+
+.sidebar .menu-item .chevron{
+  margin-left:auto; transition: transform .2s ease; opacity:.9;
+}
+.sidebar .menu-item.open > .menu-link .chevron{ transform: rotate(90deg); }
+
+.sidebar .submenu{
+  max-height:0; overflow:hidden; transition:max-height .24s ease;
+  padding-left:1.8rem; background: var(--sidebar-submenu-bg);
+}
+.sidebar .menu-item.open > .submenu{ max-height:1000px; } /* içerik yüksekliğine göre artırılabilir */

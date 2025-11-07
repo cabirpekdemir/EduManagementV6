@@ -1,82 +1,120 @@
-<div class="card card-primary">
-    <div class="card-header">
-        <h3 class="card-title">Etkinlik Takvimi</h3>
+<?php
+// modules/activities/view/calendar.php
+if (!function_exists('h')) { 
+    function h($v){ return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-8'); } 
+}
+$activities = $activities ?? [];
+
+// Etkinlikleri FullCalendar formatına çevir
+$events = [];
+foreach ($activities as $a) {
+    $events[] = [
+        'id' => (int)$a['id'],
+        'title' => $a['title'] ?? '',
+        'start' => $a['start_date'] ?? $a['activity_date'] ?? '',
+        'end' => $a['end_date'] ?? '',
+        'url' => 'index.php?module=activities&action=show&id=' . (int)$a['id'],
+        'backgroundColor' => '#4285f4',
+        'borderColor' => '#4285f4',
+        'textColor' => '#ffffff'
+    ];
+}
+?>
+
+<div class="card shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">
+      <i class="fa fa-calendar"></i> Etkinlik Takvimi
+    </h5>
+    <div>
+      <a href="index.php?module=activities&action=index" class="btn btn-sm btn-outline-secondary me-1">
+        <i class="fa fa-list"></i> Liste
+      </a>
+      <?php if (in_array(currentRole(), ['admin', 'teacher'])): ?>
+      <a href="index.php?module=activities&action=create" class="btn btn-sm btn-primary">
+        <i class="fa fa-plus"></i> Yeni Etkinlik
+      </a>
+      <?php endif; ?>
     </div>
-    <div class="card-body p-0">
-        <!-- FullCalendar burada oluşturulacak -->
-        <div id="calendar"></div>
-    </div>
+  </div>
+  <div class="card-body">
+    <div id="calendar"></div>
+  </div>
 </div>
 
-<!-- Etkinlik Detaylarını Göstermek İçin Modal (Opsiyonel ama şık) -->
-<div class="modal fade" id="eventDetailModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalTitle">Etkinlik Detayları</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <dl class="row">
-                    <dt class="col-sm-4">Kategori:</dt>
-                    <dd class="col-sm-8" id="eventCategory"></dd>
-                    <dt class="col-sm-4">Tarih ve Saat:</dt>
-                    <dd class="col-sm-8" id="eventStart"></dd>
-                    <dt class="col-sm-4">Açıklama:</dt>
-                    <dd class="col-sm-8" id="eventDescription"></dd>
-                </dl>
-            </div>
-            <div class="modal-footer">
-                <a href="#" id="editEventButton" class="btn btn-primary">Düzenle</a>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- FullCalendar CSS & JS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/locales/tr.global.min.js"></script>
 
 <script>
-// Bu script, layout.php'nin en sonunda, FullCalendar kütüphanesi yüklendikten sonra çalışır.
 document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
-    if(calendarEl) { // Takvim elementinin var olduğundan emin ol
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-            },
-            initialView: 'dayGridMonth',
-            locale: 'tr', // Türkçe dil dosyası layout'ta yüklendi
-            
-            // DÜZELTİLMİŞ KISIM: Veri kaynağı olarak controller'daki doğru eylemi çağırıyoruz.
-            events: 'index.php?module=activities&action=calendar_data',
-
-            eventClick: function(info) {
-                // Tıklanan etkinliğin varsayılan URL'ine gitmesini engelle
-                info.jsEvent.preventDefault(); 
-                
-                // Modal içindeki alanları doldur
-                document.getElementById('modalTitle').innerText = info.event.title;
-                document.getElementById('eventCategory').innerText = info.event.extendedProps.category;
-                document.getElementById('eventDescription').innerText = info.event.extendedProps.description;
-                document.getElementById('eventStart').innerText = info.event.start.toLocaleString('tr-TR', { dateStyle: 'long', timeStyle: 'short' });
-                
-                // Düzenle butonunun linkini ayarla
-                var editButton = document.getElementById('editEventButton');
-                if(info.event.url) {
-                    editButton.href = info.event.url;
-                    editButton.style.display = 'inline-block';
-                } else {
-                    editButton.style.display = 'none';
-                }
-
-                // Modal'ı göster (jQuery gerekli)
-                $('#eventDetailModal').modal('show');
+    
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'tr',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+        },
+        buttonText: {
+            today: 'Bugün',
+            month: 'Ay',
+            week: 'Hafta',
+            day: 'Gün',
+            list: 'Liste'
+        },
+        height: 'auto',
+        navLinks: true,
+        editable: false,
+        dayMaxEvents: true,
+        events: <?= json_encode($events, JSON_UNESCAPED_UNICODE) ?>,
+        eventClick: function(info) {
+            info.jsEvent.preventDefault();
+            if (info.event.url) {
+                window.location.href = info.event.url;
             }
-        });
-        calendar.render();
-    }
+        },
+        eventMouseEnter: function(info) {
+            info.el.style.cursor = 'pointer';
+        }
+    });
+    
+    calendar.render();
 });
 </script>
+
+<style>
+#calendar {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.fc {
+    font-size: 0.9em;
+}
+
+.fc-event {
+    cursor: pointer;
+}
+
+.fc-event:hover {
+    opacity: 0.85;
+}
+
+.fc-toolbar-title {
+    font-size: 1.5em !important;
+    font-weight: 600;
+}
+
+.fc-button {
+    text-transform: capitalize !important;
+}
+
+.fc-daygrid-event {
+    white-space: normal !important;
+    align-items: normal !important;
+}
+</style>

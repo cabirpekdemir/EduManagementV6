@@ -1,126 +1,362 @@
 <?php
 require_once __DIR__ . '/../../core/database.php';
-require_once __DIR__ . '/../../core/helpers.php';
 
-class ClassesController {
-    private $db;
+class ClassesController
+{
+    protected $db;
 
-    public function __construct() {
-        $this->db = Database::getInstance()->getConnection();
+    public function __construct()
+    {
+        $this->db = Database::getInstance();
+        if (session_status() === PHP_SESSION_NONE) @session_start();
     }
 
-    public function index() {
-        $stmt = $this->db->query("
-            SELECT c.*, u.name as advisor_name
+    private function currentUserId(): int
+    {
+        return (int)($_SESSION['user']['id'] ?? $_SESSION['user_id'] ?? 0);
+    }
+
+    private function currentRole(): string
+    {
+        return $_SESSION['user']['role'] ?? $_SESSION['role'] ?? 'guest';
+    }
+
+    private function flashSuccess(string $msg): void
+    {
+        $_SESSION['flash_success'] = $msg;
+    }
+
+    private function flashError(string $msg): void
+    {
+        $_SESSION['flash_error'] = $msg;
+    }
+
+    /* ==================== INDEX/LIST ==================== */
+    public function index(): array
+    {
+        return $this->list();
+    }
+
+    public function list(): array
+    {
+        $classes = $this->db->select("
+            SELECT c.*, 
+                   u.name AS advisor_name,
+                   (SELECT COUNT(*) FROM users WHERE class_id = c.id AND role = 'student') AS student_count
             FROM classes c
             LEFT JOIN users u ON c.advisor_teacher_id = u.id
             ORDER BY c.name ASC
-        ");
-        $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return ['pageTitle' => 'Sınıflar', 'classes' => $classes];
+        ") ?? [];
+
+        return [
+            'view'      => 'classes/view/list.php',
+            'title'     => 'Sınıflar',
+            'classes'   => $classes,
+            'canDelete' => ($this->currentRole() === 'admin')
+        ];
     }
 
-    public function create() {
-        $stmt = $this->db->query("SELECT id, name FROM users WHERE role = 'teacher' ORDER BY name ASC");
-        $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return ['pageTitle' => 'Yeni Sınıf Ekle', 'teachers' => $teachers];
+    /* ==================== CREATE ==================== */
+    public function create(): array
+    {
+        $teachers = $this->db->select("
+            SELECT id, name FROM users 
+            WHERE role='teacher' AND is_active=1 
+            ORDER BY name ASC
+        ") ?? [];
+
+        return [
+            'view'              => 'classes/view/form.php',
+            'title'             => 'Yeni Sınıf',
+            'class'             => null,
+            'teachers'          => $teachers,
+            'selectedAdvisor'   => null,
+            'isEdit'            => false,
+            'formAction'        => 'index.php?module=classes&action=store'
+        ];
     }
 
-    public function store() {
-        $sql = "INSERT INTO classes (name, description, advisor_teacher_id) VALUES (?, ?, ?)";
-        $stmt = $this->db->prepare($sql);
-        // Eğer advisor_teacher_id boş gelirse, null olarak kaydet.
-        // Bu, veritabanı sütununun NULL değer kabul ettiğini varsayar.
-        $advisor_id = !empty($_POST['advisor_teacher_id']) ? $_POST['advisor_teacher_id'] : null;
-        $stmt->execute([$_POST['name'], $_POST['description'], $advisor_id]);
-        redirect('?module=classes&action=index');
+/* ==================== STORE ==================== */
+public function store(): void
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Location: index.php?module=classes&action=create');
         exit;
     }
 
-    public function edit() {
-        $id = $_GET['id'] ?? null;
-        if (!$id) {
-            redirect('?module=classes&action=index');
-            exit; // Yönlendirmeden sonra script'in çalışmasını durdur.
-        }
+    $data = [
+        'name'               => trim($_POST['name'] ?? ''),
+        'description'        => trim($_POST['description'] ?? ''),
+        'advisor_teacher_id' => !empty($_POST['advisor_teacher_id']) ? (int)$_POST['advisor_teacher_id'] : null
+    ];
 
-        $stmt_class = $this->db->prepare("SELECT * FROM classes WHERE id = ?");
-        $stmt_class->execute([$id]);
-        $class = $stmt_class->fetch(PDO::FETCH_ASSOC);
+    $errors = [];
 
-        // Eğer sınıf bulunamazsa ana sayfaya yönlendir
-        if (!$class) {
-            redirect('?module=classes&action=index');
-            exit;
-        }
-
-        $stmt_teachers = $this->db->query("SELECT id, name FROM users WHERE role = 'teacher' ORDER BY name ASC");
-        $teachers = $stmt_teachers->fetchAll(PDO::FETCH_ASSOC);
-
-        return ['pageTitle' => 'Sınıfı Düzenle', 'class' => $class, 'teachers' => $teachers];
+    if (empty($data['name'])) {
+        $errors['name'] = 'Sınıf adı zorunludur.';
     }
 
-    // --- GÜNCELLENMİŞ UPDATE METODU ---
-    public function update() {
-        $id = $_POST['id'] ?? null;
-        $name = $_POST['name'] ?? null;
-        $description = $_POST['description'] ?? null;
-        // Eğer advisor_teacher_id boş gelirse (yani formdan seçilmezse), null olarak ayarla.
-        // Bu, veritabanı sütununun NULL değer kabul ettiğini varsayar.
-        $advisor_id = !empty($_POST['advisor_teacher_id']) ? $_POST['advisor_teacher_id'] : null;
+    if (!empty($errors)) {
+        $_SESSION['old_input'] = $data;
+        $_SESSION['validation_errors'] = $errors;
+        header('Location: index.php?module=classes&action=create');
+        exit;
+    }
 
-        // ID'nin varlığını kontrol et
-        if (!$id) {
-            // Hata mesajı ile ana sayfaya yönlendirilebilir veya bir hata ekranı gösterilebilir
-            redirect('?module=classes&action=index&error=no_id_provided');
+    // Duplicate check
+    $dupName = $this->db->fetch("SELECT id FROM classes WHERE name = ?", [$data['name']]);
+    if ($dupName) {
+        $errors['name'] = 'Bu sınıf adı zaten kullanımda.';
+    }
+
+    if (!empty($errors)) {
+        $_SESSION['old_input'] = $data;
+        $_SESSION['validation_errors'] = $errors;
+        header('Location: index.php?module=classes&action=create');
+        exit;
+    }
+
+    try {
+        // DÜZELTME: created_at kaldırıldı
+        $this->db->execute("
+            INSERT INTO classes (name, description, advisor_teacher_id)
+            VALUES (?, ?, ?)
+        ", [$data['name'], $data['description'], $data['advisor_teacher_id']]);
+
+        unset($_SESSION['old_input'], $_SESSION['validation_errors']);
+
+        $this->flashSuccess('Sınıf oluşturuldu.');
+        header('Location: index.php?module=classes&action=list');
+        exit;
+
+    } catch (\Throwable $e) {
+        error_log('Class store error: ' . $e->getMessage());
+        $_SESSION['old_input'] = $data;
+        $_SESSION['validation_errors'] = ['general' => 'Veritabanı hatası: ' . $e->getMessage()];
+        header('Location: index.php?module=classes&action=create');
+        exit;
+    }
+}
+    /* ==================== EDIT ==================== */
+    public function edit(): array
+    {
+        $id = (int)($_GET['id'] ?? 0);
+        if ($id <= 0) {
+            $this->flashError('Geçersiz ID.');
+            header('Location: index.php?module=classes&action=list');
             exit;
         }
 
-        // Temel alanların boş olup olmadığını kontrol edebilirsiniz, isteğe bağlı
-        if (empty($name) || empty($description)) {
-            // Hata mesajı ile geri yönlendirilebilir
-            redirect('?module=classes&action=edit&id=' . $id . '&error=missing_fields');
+        $class = $this->db->fetch("SELECT * FROM classes WHERE id = ?", [$id]);
+
+        if (!$class) {
+            $this->flashError('Sınıf bulunamadı.');
+            header('Location: index.php?module=classes&action=list');
+            exit;
+        }
+
+        $teachers = $this->db->select("
+            SELECT id, name FROM users 
+            WHERE role='teacher' AND is_active=1 
+            ORDER BY name
+        ") ?? [];
+
+        // Old input varsa kullan
+        $oldInput = $_SESSION['old_input'] ?? [];
+        $errors = $_SESSION['validation_errors'] ?? [];
+        unset($_SESSION['old_input'], $_SESSION['validation_errors']);
+
+        $classData = [
+            'id'                 => (int)$class['id'],
+            'name'               => $class['name'] ?? '',
+            'description'        => $class['description'] ?? '',
+            'advisor_teacher_id' => $class['advisor_teacher_id'] ?? null
+        ];
+
+        if (!empty($oldInput)) {
+            $classData = array_merge($classData, $oldInput);
+        }
+
+        return [
+            'view'            => 'classes/view/form.php',
+            'title'           => 'Sınıf Düzenle',
+            'class'           => $classData,
+            'teachers'        => $teachers,
+            'selectedAdvisor' => $classData['advisor_teacher_id'] ?? null,
+            'isEdit'          => true,
+            'formAction'      => 'index.php?module=classes&action=update&id=' . $id,
+            'errors'          => $errors
+        ];
+    }
+
+    /* ==================== UPDATE ==================== */
+    public function update(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php?module=classes&action=list');
+            exit;
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        if ($id <= 0) {
+            $this->flashError('Geçersiz ID.');
+            header('Location: index.php?module=classes&action=list');
+            exit;
+        }
+
+        $class = $this->db->fetch("SELECT * FROM classes WHERE id = ?", [$id]);
+
+        if (!$class) {
+            $this->flashError('Sınıf bulunamadı.');
+            header('Location: index.php?module=classes&action=list');
+            exit;
+        }
+
+        $data = [
+            'name'               => trim($_POST['name'] ?? ''),
+            'description'        => trim($_POST['description'] ?? ''),
+            'advisor_teacher_id' => !empty($_POST['advisor_teacher_id']) ? (int)$_POST['advisor_teacher_id'] : null
+        ];
+
+        $errors = [];
+
+        if (empty($data['name'])) {
+            $errors['name'] = 'Sınıf adı zorunludur.';
+        }
+
+        if (!empty($errors)) {
+            $_SESSION['old_input'] = $data;
+            $_SESSION['validation_errors'] = $errors;
+            header('Location: index.php?module=classes&action=edit&id=' . $id);
+            exit;
+        }
+
+        // Duplicate check
+        $dupName = $this->db->fetch("SELECT id FROM classes WHERE name = ? AND id != ?", [$data['name'], $id]);
+        if ($dupName) {
+            $errors['name'] = 'Bu sınıf adı başka bir sınıfta kullanılıyor.';
+        }
+
+        if (!empty($errors)) {
+            $_SESSION['old_input'] = $data;
+            $_SESSION['validation_errors'] = $errors;
+            header('Location: index.php?module=classes&action=edit&id=' . $id);
             exit;
         }
 
         try {
-            $sql = "UPDATE classes SET name = ?, description = ?, advisor_teacher_id = ? WHERE id = ?";
-            $stmt = $this->db->prepare($sql);
+            $this->db->execute("
+                UPDATE classes SET
+                    name=?, description=?, advisor_teacher_id=?
+                WHERE id=?
+            ", [$data['name'], $data['description'], $data['advisor_teacher_id'], $id]);
 
-            $params = [
-                $name,
-                $description,
-                $advisor_id,
-                $id
-            ];
+            unset($_SESSION['old_input'], $_SESSION['validation_errors']);
 
-            $result = $stmt->execute($params);
+            $this->flashSuccess('Sınıf güncellendi.');
+            header('Location: index.php?module=classes&action=show&id=' . $id);
+            exit;
 
-            if ($result) {
-                // Başarılı olursa sınıflar listesine yönlendir
-                redirect('?module=classes&action=index&success=class_updated');
-            } else {
-                // Eğer execute false dönerse (genellikle PDO hatası olmadığında ama bir sorun olduğunda)
-                // Daha detaylı hata mesajı için errorInfo kullanılabilir.
-                $errorInfo = $stmt->errorInfo();
-                error_log("Class update failed: " . implode(" - ", $errorInfo)); // Hata loguna yaz
-                redirect('?module=classes&action=index&error=update_failed&msg=' . urlencode($errorInfo[2] ?? 'Bilinmeyen Hata'));
-            }
-        } catch (PDOException $e) {
-            // Veritabanı bağlantısı veya SQL sorgusu sırasında bir hata oluşursa
-            error_log("PDOException in Class update: " . $e->getMessage()); // Hata loguna yaz
-            redirect('?module=classes&action=index&error=db_error&msg=' . urlencode($e->getMessage()));
+        } catch (\Throwable $e) {
+            error_log('Class update error: ' . $e->getMessage());
+            $_SESSION['old_input'] = $data;
+            $_SESSION['validation_errors'] = ['general' => 'Veritabanı hatası: ' . $e->getMessage()];
+            header('Location: index.php?module=classes&action=edit&id=' . $id);
+            exit;
         }
-        exit; // Yönlendirmeden sonra script'in çalışmasını durdur.
     }
 
-    public function delete() {
-        $id = $_GET['id'] ?? null;
-        if ($id) {
-            $stmt = $this->db->prepare("DELETE FROM classes WHERE id = ?");
-            $stmt->execute([$id]);
+    /* ==================== SHOW ==================== */
+    public function show(): array
+    {
+        $id = (int)($_GET['id'] ?? 0);
+        if ($id <= 0) {
+            $this->flashError('Geçersiz ID.');
+            header('Location: index.php?module=classes&action=list');
+            exit;
         }
-        redirect('?module=classes&action=index');
-        exit;
+
+        $class = $this->db->fetch("
+            SELECT c.*, u.name AS advisor_name
+            FROM classes c
+            LEFT JOIN users u ON c.advisor_teacher_id = u.id
+            WHERE c.id = ?
+        ", [$id]);
+
+        if (!$class) {
+            $this->flashError('Sınıf bulunamadı.');
+            header('Location: index.php?module=classes&action=list');
+            exit;
+        }
+
+        // Sınıftaki öğrenciler
+        $students = $this->db->select("
+            SELECT id, name, email, tc_kimlik
+            FROM users
+            WHERE class_id = ? AND role = 'student'
+            ORDER BY name
+        ", [$id]) ?? [];
+
+        // Sınıfın dersleri
+        $courses = $this->db->select("
+            SELECT c.id, c.name, c.code, u.name AS teacher_name
+            FROM courses c
+            LEFT JOIN users u ON u.id = c.teacher_id
+            JOIN course_classes cc ON cc.course_id = c.id
+            WHERE cc.class_id = ?
+            ORDER BY c.name
+        ", [$id]) ?? [];
+
+        return [
+            'view'      => 'classes/view/show.php',
+            'title'     => 'Sınıf Detay',
+            'class'     => $class,
+            'students'  => $students,
+            'courses'   => $courses,
+            'canDelete' => ($this->currentRole() === 'admin')
+        ];
+    }
+
+    /* ==================== DELETE ==================== */
+    public function delete(): void
+    {
+        if ($this->currentRole() !== 'admin') {
+            $this->flashError('Silme yetkiniz yok.');
+            header('Location: index.php?module=classes&action=list');
+            exit;
+        }
+
+        $id = (int)($_GET['id'] ?? 0);
+        if ($id <= 0) {
+            $this->flashError('Geçersiz ID.');
+            header('Location: index.php?module=classes&action=list');
+            exit;
+        }
+
+        try {
+            // İlişkili kayıtları kontrol et
+            $studentCount = $this->db->fetch("SELECT COUNT(*) as count FROM users WHERE class_id = ?", [$id]);
+            if ($studentCount['count'] > 0) {
+                $this->flashError('Bu sınıfta öğrenci bulunduğu için silinemez. Önce öğrencileri başka sınıfa atayın.');
+                header('Location: index.php?module=classes&action=list');
+                exit;
+            }
+
+            // İlişkili kayıtları sil
+            $this->db->execute("DELETE FROM course_classes WHERE class_id = ?", [$id]);
+            
+            // Sınıfı sil
+            $this->db->execute("DELETE FROM classes WHERE id = ?", [$id]);
+
+            $this->flashSuccess('Sınıf silindi.');
+            header('Location: index.php?module=classes&action=list');
+            exit;
+
+        } catch (\Throwable $e) {
+            error_log('Class delete error: ' . $e->getMessage());
+            $this->flashError('Silme hatası: ' . $e->getMessage());
+            header('Location: index.php?module=classes&action=list');
+            exit;
+        }
     }
 }

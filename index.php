@@ -1,7 +1,7 @@
 <?php
 // Geliştirme aşamasında tüm hataları görmek için:
-// error_reporting(E_ALL);
-// ini_set('display_errors', 1);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 // 1. OTURUMU VE TEMEL AYARLARI BAŞLAT
 // Oturum başlatma, projenin en başında, herhangi bir HTML çıktısından önce yapılmalıdır.
@@ -33,10 +33,50 @@ if (!isset($_SESSION['user']) && !in_array($module, ['login', 'register'])) {
     exit;
 }
 
+// Dashboard modülü
+if ($module === 'dashboard') {
+    
+    // Session kontrolü - SİZİN SİSTEMİNİZE UYGUN
+    if (!isset($_SESSION['user'])) {
+        redirect('index.php?module=login&action=index');
+        exit;
+    }
+    
+    // Controller'ı yükle
+    require_once __DIR__ . '/modules/dashboard/dashboardcontroller.php';
+    
+    // Controller oluştur
+    $controller = new DashboardController();
+    
+    // Action'ı çalıştır
+    if (method_exists($controller, $action)) {
+        $controller->$action();
+    } else {
+        $controller->index();
+    }
+    
+    exit;
+}
+
 // 4. KONTROLCÜ (CONTROLLER) DOSYASINI VE SINIFINI BUL
-// Genel kural: ModülAdıController (örn: ActivitiesController)
-$controllerName = ucfirst($module) . 'Controller';
-$controllerFile = __DIR__ . "/modules/{$module}/{$module}controller.php";
+// ⭐ YENİ: view_as gibi özel modüller için farklı isimlendirme desteği
+$controllerName = '';
+$controllerFile = '';
+
+// Özel modül kontrolü (alt çizgi içeren modüller)
+if ($module === 'view_as') {
+    // view_as modülü için özel tanımlama
+    $controllerName = 'View_asController';
+    $controllerFile = __DIR__ . "/modules/view_as/view_ascontroller.php";
+} elseif ($module === 'lesson_attendance') {
+    // lesson_attendance modülü için özel tanımlama (varsa)
+    $controllerName = 'Lesson_attendanceController';
+    $controllerFile = __DIR__ . "/modules/lesson_attendance/lesson_attendancecontroller.php";
+} else {
+    // Genel kural: ModülAdıController (örn: ActivitiesController)
+    $controllerName = ucfirst($module) . 'Controller';
+    $controllerFile = __DIR__ . "/modules/{$module}/{$module}controller.php";
+}
 
 // 5. KONTROLCÜYÜ ÇALIŞTIR VE VIEW İÇİN VERİYİ HAZIRLA
 if (file_exists($controllerFile)) {
@@ -100,6 +140,5 @@ if (file_exists($controllerFile)) {
 } else {
     // 404 - Sayfa Bulunamadı
     http_response_code(404);
-    die("Hata: İstenen modül ('$module') bulunamadı.");
+    die("Hata: İstenen modül ('$module') bulunamadı. Dosya yolu: $controllerFile");
 }
-

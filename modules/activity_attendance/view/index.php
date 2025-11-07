@@ -1,61 +1,90 @@
-<h2>Etkinlik Yoklaması</h2>
-<p class="lead">Yoklama almak için lütfen listeden bir etkinlik seçin.</p>
-
-<!-- Bildirim Mesajları -->
-<?php if (isset($error_message)): ?>
-    <div class="alert alert-danger">
-        <strong>Hata:</strong> <?= htmlspecialchars($error_message) ?>
-    </div>
-<?php endif; ?>
-<?php if (isset($_GET['status']) && $_GET['status'] === 'saved'): ?>
-    <div class="alert alert-success">Yoklama başarıyla kaydedildi.</div>
-<?php endif; ?>
-
-<div class="card card-primary card-outline">
-    <div class="card-header">
-        <h3 class="card-title">Etkinlik Seçim Formu</h3>
-    </div>
-    <form method="GET" action="index.php">
-        <div class="card-body">
-            <input type="hidden" name="module" value="activity_attendance">
-            <input type="hidden" name="action" value="take">
-
-            <div class="form-group">
-                <label for="activity_id_select"><b>Etkinlik Seçin:</b></label>
-                <select name="activity_id" id="activity_id_select" required class="form-control">
-                    <option value="">-- Etkinlik Seçiniz --</option>
-                    <?php if(!empty($activities)): ?>
-                        <?php foreach($activities as $activity): ?>
-                            <option value="<?= htmlspecialchars($activity['id']) ?>">
-                                <?= htmlspecialchars($activity['name']) ?> 
-                                (<?= htmlspecialchars(date('d.m.Y', strtotime($activity['activity_date']))) ?>)
-                                <?= !empty($activity['category_name']) ? ' - ' . htmlspecialchars($activity['category_name']) : '' ?>
-                            </option>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <option value="" disabled>Yoklaması alınacak aktif etkinlik bulunmamaktadır.</option>
-                    <?php endif; ?>
-                </select>
-            </div>
-        </div>
-        <div class="card-footer">
-            <button type="submit" class="btn btn-success">
-                <i class="fa fa-list-ul"></i> Yoklama Listesini Getir
-            </button>
-        </div>
-    </form>
+<?php
+if (!function_exists('e')) {
+  function e($v){ return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-8'); }
+}
+$rows = $rows ?? [];
+?>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Etkinlik Yoklamaları</h4>
+  <div>
+    <a href="index.php?module=activity_attendance&action=take" class="btn btn-primary btn-sm">Yoklama Al</a>
+    <a href="index.php?module=activity_attendance&action=report" class="btn btn-outline-secondary btn-sm">Rapor</a>
+  </div>
 </div>
 
-<hr>
-
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title">Raporlar</h3>
+<?php if (empty($rows)): ?>
+  <div class="card"><div class="card-body text-muted">Kayıt bulunamadı.</div></div>
+<?php else: ?>
+  <div class="card">
+    <div class="card-body table-responsive">
+      <table class="table table-sm align-middle mb-0">
+        <thead>
+          <tr>
+            <th style="width:12%">Tarih</th>
+            <th style="width:24%">Etkinlik</th>
+            <th style="width:20%">Öğrenci</th>
+            <th style="width:10%">Sınıf</th>
+            <th style="width:10%">Durum</th>
+            <th>Not</th>
+            <th style="width:14%">Kaydı Giren</th>
+            <th style="width:10%">İşlemler</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($rows as $r): 
+            $id  = (int)$r['id'];
+            $aid = (int)$r['activity_id'];
+            $cid = (int)($r['class_id'] ?? 0);
+            $eid = (int)($r['entry_by_user_id'] ?? 0);
+          ?>
+            <tr>
+              <td><?= e($r['attendance_date']) ?></td>
+              <td>
+                <a href="index.php?module=activities&action=show&id=<?= $aid ?>">
+                  <?= e($r['activity_title']) ?>
+                </a>
+              </td>
+              <td>
+                <a href="index.php?module=students&action=show&id=<?= (int)$r['student_id'] ?>">
+                  <?= e($r['student_name']) ?>
+                </a>
+              </td>
+              <td>
+                <?php if ($cid): ?>
+                  <a href="index.php?module=classes&action=show&id=<?= $cid ?>">
+                    <?= e($r['class_name'] ?? '—') ?>
+                  </a>
+                <?php else: ?>
+                  <span class="text-muted">—</span>
+                <?php endif; ?>
+              </td>
+              <td>
+                <?php
+                  $st = (string)($r['status'] ?? '');
+                  $cls = ($st==='Geldi' ? 'bg-success' : ($st==='İzinli' ? 'bg-warning text-dark' : 'bg-danger'));
+                ?>
+                <span class="badge <?= $cls ?>"><?= e($st ?: '—') ?></span>
+              </td>
+              <td class="text-muted"><?= nl2br(e($r['notes'] ?? '')) ?></td>
+              <td>
+                <?php if ($eid): ?>
+                  <a href="index.php?module=users&action=show&id=<?= $eid ?>"><?= e($r['entry_by_name'] ?? '—') ?></a>
+                <?php else: ?>
+                  <span class="text-muted"><?= e($r['entry_by_name'] ?? '—') ?></span>
+                <?php endif; ?>
+              </td>
+              <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary" href="index.php?module=activity_attendance&action=show&id=<?= $id ?>">Gör</a>
+                <a class="btn btn-sm btn-warning" href="index.php?module=activity_attendance&action=edit&id=<?= $id ?>">Düzenle</a>
+                <form action="index.php?module=activity_attendance&action=delete" method="post" class="d-inline" onsubmit="return confirm('Bu yoklama kaydı silinsin mi?');">
+                  <input type="hidden" name="id" value="<?= $id ?>">
+                  <button type="submit" class="btn btn-sm btn-danger">Sil</button>
+                </form>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
     </div>
-    <div class="card-body">
-        <p>Tüm etkinlikler için detaylı katılım raporlarını görüntüleyin.</p>
-        <a href="index.php?module=activity_attendance&action=report" class="btn btn-info">
-            <i class="fa fa-bar-chart"></i> Detaylı Etkinlik Yoklama Raporları
-        </a>
-    </div>
-</div>
+  </div>
+<?php endif; ?>

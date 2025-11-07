@@ -1,1 +1,3 @@
-<?php include __DIR__ . '/form.php'; ?>
+<?php
+// modules/course_groups/view/edit.php
+include __DIR__ . '/form.php';

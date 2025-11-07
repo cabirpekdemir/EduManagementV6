@@ -1,108 +1,149 @@
-<h2>Etkinlik Yönetimi</h2>
+<?php
+// modules/activities/view/index.php
+if (!function_exists('h')) { 
+    function h($v){ return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-8'); } 
+}
 
-<!-- Butonlar AdminLTE stiliyle güncellendi -->
-<a href="index.php?module=activities&action=create" class="btn btn-primary mb-3">
-    <i class="fa fa-plus"></i> Yeni Etkinlik Oluştur
-</a>
-<a href="index.php?module=activities&action=calendar" class="btn btn-info mb-3">
-    <i class="fa fa-calendar"></i> Takvim Görünümü
-</a>
+$activities = $activities ?? [];
+$csrf_token = $csrf_token ?? '';
 
-<!-- Bildirim Mesajları -->
-<?php if (isset($_GET['status_message'])): ?>
-    <div class="alert alert-success">
-        <?php
-        $messages = [
-            'created' => 'Etkinlik başarıyla oluşturuldu ve onaya gönderildi.',
-            'updated' => 'Etkinlik başarıyla güncellendi.',
-            'deleted' => 'Etkinlik başarıyla silindi.',
-            'approved' => 'Etkinlik onaylandı.',
-            'rejected' => 'Etkinlik reddedildi.'
-        ];
-        echo htmlspecialchars($messages[$_GET['status_message']] ?? 'İşlem başarılı.');
-        ?>
+// Flash mesajları
+if (isset($_SESSION['form_error'])): ?>
+    <div class="alert alert-danger alert-dismissible fade show">
+        <?= h($_SESSION['form_error']) ?>
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
     </div>
-<?php endif; ?>
-<?php if (isset($_GET['error_message'])): ?>
-     <div class="alert alert-danger">
-        <?= htmlspecialchars($_GET['error_message']) ?>
-     </div>
-<?php endif; ?>
+    <?php unset($_SESSION['form_error']); endif;
 
-
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title">Tüm Etkinlikler</h3>
+if (isset($_SESSION['form_ok'])): ?>
+    <div class="alert alert-success alert-dismissible fade show">
+        <?= h($_SESSION['form_ok']) ?>
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
     </div>
-    <div class="card-body p-0">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Başlık</th>
-                    <th>Kategori</th>
-                    <th>Tarih</th>
-                    <th>Oluşturan</th>
-                    <th>Durum</th>
-                    <th style="width: 25%;">İşlemler</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (!empty($activities)): ?>
-                    <?php foreach ($activities as $activity): ?>
-                    <tr>
-                        <td data-label="Başlık"><strong><?= htmlspecialchars($activity['title']) ?></strong></td>
-                        <td data-label="Kategori"><?= htmlspecialchars($activity['category_name'] ?? 'Belirtilmemiş') ?></td>
-                        <td data-label="Tarih"><?= htmlspecialchars(date('d.m.Y H:i', strtotime($activity['activity_date']))) ?></td>
-                        <td data-label="Oluşturan"><?= htmlspecialchars($activity['creator_name']) ?></td>
-                        <td data-label="Durum">
-                            <?php
-                                $status = $activity['status'] ?? 'bilinmiyor';
-                                $status_map = [
-                                    'approved' => ['class' => 'badge-success', 'text' => 'Onaylandı'],
-                                    'pending' => ['class' => 'badge-warning', 'text' => 'Bekliyor'],
-                                    'rejected' => ['class' => 'badge-danger', 'text' => 'Reddedildi']
-                                ];
-                                $s = $status_map[$status] ?? ['class' => 'badge-secondary', 'text' => ucfirst($status)];
-                            ?>
-                            <span class="badge <?= $s['class'] ?>"><?= $s['text'] ?></span>
-                        </td>
-                        <td data-label="İşlemler">
-                            <?php if ($activity['status'] === 'approved'): ?>
-                                <a href="<?= generateGoogleCalendarLink($activity) ?>" target="_blank" class="btn btn-sm btn-light" title="Google Takvime Ekle">
-                                    <i class="fa fa-google"></i>
-                                </a>
-                            <?php endif; ?>
+    <?php unset($_SESSION['form_ok']); endif;
+?>
 
-                            <?php
-                            $can_edit = ($userRole === 'admin' || ($userRole === 'teacher' && $activity['creator_id'] == $currentUserId));
-                            $can_delete = $can_edit;
-                            ?>
-                            <?php if ($can_edit): ?>
-                                <a href="index.php?module=activities&action=edit&id=<?= htmlspecialchars($activity['id']) ?>" class="btn btn-sm btn-warning">
-                                    <i class="fa fa-pencil"></i>
-                                </a>
-                            <?php endif; ?>
-                            <?php if ($can_delete): ?>
-                                <a href="index.php?module=activities&action=delete&id=<?= htmlspecialchars($activity['id']) ?>"
-                                   class="btn btn-sm btn-danger ml-1"
-                                   onclick="return confirm('Bu etkinliği silmek istediğinize emin misiniz?')">
-                                   <i class="fa fa-trash"></i>
-                                </a>
-                            <?php endif; ?>
-
-                            <?php if ($userRole === 'admin' && $activity['status'] === 'pending'): ?>
-                                <form method="post" action="index.php?module=activities&action=approve&id=<?= htmlspecialchars($activity['id']) ?>" class="d-inline-block mt-2">
-                                    <button type="submit" class="btn btn-sm btn-success">Onayla</button>
-                                    <a href="index.php?module=activities&action=reject&id=<?= htmlspecialchars($activity['id']) ?>" class="btn btn-sm btn-outline-danger ml-1">Reddet</a>
-                                </form>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
+<div class="card shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Etkinlikler</h5>
+    <div>
+      <?php if (in_array(currentRole(), ['admin', 'teacher'])): ?>
+      <a href="index.php?module=activities&action=create" class="btn btn-primary btn-sm">
+        <i class="fa fa-plus"></i> Yeni Etkinlik
+      </a>
+      <?php endif; ?>
+      <a href="index.php?module=activities&action=calendar" class="btn btn-outline-secondary btn-sm">
+        <i class="fa fa-calendar"></i> Takvim
+      </a>
+    </div>
+  </div>
+  <div class="card-body">
+    <?php if (empty($activities)): ?>
+      <div class="alert alert-info">Henüz kayıtlı etkinlik bulunmuyor.</div>
+    <?php else: ?>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th style="width:8%">Afiş</th>
+            <th style="width:5%">#</th>
+            <th style="width:23%">Başlık</th>
+            <th style="width:16%">Öğretmen</th>
+            <th style="width:18%">Sınıflar</th>
+            <th style="width:16%">Tarih</th>
+            <th class="text-end" style="width:14%">İşlemler</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($activities as $row): ?>
+            <tr>
+              <td>
+                <?php if (!empty($row['image_path'])): ?>
+                  <a href="index.php?module=activities&action=show&id=<?= (int)$row['id'] ?>">
+                    <img src="<?= h(BASE_URL . $row['image_path']) ?>" 
+                         alt="<?= h($row['title']) ?>"
+                         class="rounded"
+                         style="width: 50px; height: 50px; object-fit: cover; cursor: pointer;"
+                         title="Etkinliği görüntüle">
+                  </a>
                 <?php else: ?>
-                    <tr><td colspan="6" class="text-center p-4">Kayıtlı etkinlik bulunamadı.</td></tr>
+                  <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                       style="width: 50px; height: 50px;">
+                    <i class="fa fa-image text-muted"></i>
+                  </div>
                 <?php endif; ?>
-            </tbody>
-        </table>
+              </td>
+              <td><?= h($row['id']) ?></td>
+              <td>
+                <strong><?= h($row['title']) ?></strong>
+                <?php if (!empty($row['location'])): ?>
+                  <br><small class="text-muted"><i class="fa fa-map-marker"></i> <?= h($row['location']) ?></small>
+                <?php endif; ?>
+              </td>
+              <td><?= h($row['teacher_name'] ?? '—') ?></td>
+              <td>
+                <?php if (!empty($row['classes'])): ?>
+                  <?php foreach ($row['classes'] as $cl): ?>
+                    <span class="badge bg-secondary me-1"><?= h($cl['class_name']) ?></span>
+                  <?php endforeach; ?>
+                <?php else: ?>
+                  <span class="text-muted">—</span>
+                <?php endif; ?>
+              </td>
+              <td>
+                <small>
+                  <?php 
+                    if (!empty($row['start_date'])) {
+                        echo h(date('d.m.Y H:i', strtotime($row['start_date'])));
+                        if (!empty($row['end_date']) && $row['end_date'] !== $row['start_date']) {
+                            echo '<br>→ ' . h(date('d.m.Y H:i', strtotime($row['end_date'])));
+                        }
+                    } else {
+                        echo '—';
+                    }
+                  ?>
+                </small>
+              </td>
+              <td class="text-end">
+                <!-- STANDART BUTONLAR -->
+                <a href="index.php?module=activities&action=show&id=<?= (int)$row['id'] ?>" 
+                   class="btn btn-sm btn-outline-primary me-1" 
+                   title="Görüntüle">
+                  <i class="fa fa-eye"></i> Gör
+                </a>
+                
+                <?php if (in_array(currentRole(), ['admin', 'teacher'])): ?>
+                <a href="index.php?module=activities&action=edit&id=<?= (int)$row['id'] ?>" 
+                   class="btn btn-sm btn-warning me-1"
+                   title="Düzenle">
+                  <i class="fa fa-edit"></i> Düzenle
+                </a>
+                
+                <form action="index.php?module=activities&action=destroy" 
+                      method="post" 
+                      class="d-inline"
+                      onsubmit="return confirm('Bu etkinliği silmek istediğinize emin misiniz?');">
+                  <input type="hidden" name="id" value="<?= (int)$row['id'] ?>">
+                  <input type="hidden" name="csrf_token" value="<?= h($csrf_token) ?>">
+                  <button type="submit" class="btn btn-sm btn-danger" title="Sil">
+                    <i class="fa fa-trash"></i> Sil
+                  </button>
+                </form>
+                <?php endif; ?>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
     </div>
+    <?php endif; ?>
+  </div>
 </div>
+
+<style>
+td img:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+</style>

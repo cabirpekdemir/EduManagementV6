@@ -1,1 +1,2 @@
-<?php include __DIR__ . '/form.php'; ?>
+<?php
+include __DIR__ . '/form.php';

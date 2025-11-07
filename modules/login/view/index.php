@@ -29,11 +29,16 @@
         }
         
     </style>
+    <style>.auth-page .main-sidebar,
+.auth-page .main-header,
+.auth-page .main-footer { display:none !important; }
+.auth-page .content-wrapper { margin-left:0 !important; }
+</style>
 </head>
-<body class="hold-transition login-page">
+<body class="auth-page">
 <div class="login-box">
         <div class="logo">
-            <img src="themes/default/logo.png" alt="Logo" width="240px">
+            <img src="themes/default/logo.png" alt="Logo" width="320px" >
         </div>
         <div class="card">
             <div class="card-body login-card-body">
@@ -67,7 +72,11 @@
 
       </form>
                 <p class="mt-3 mb-1 text-center">
-                    <a href="#">Şifremi unuttum</a>
+                    <div class="text-center mt-3">
+    <a href="index.php?module=login&action=forgot_password" class="text-muted">
+        <i class="fas fa-question-circle"></i> Şifremi Unuttum
+    </a>
+</div>
                 </p>
             </div>
         </div>

@@ -1,60 +1,73 @@
-<h2><?= $isEdit ? "Menü Öğesini Düzenle" : "Yeni Menü Öğesi Ekle" ?></h2>
+<?php
+// Beklenen değişkenler:
+// $menu (veya null), $parent_options (id,title,depth), $exclude_ids (dizi), $all_roles, $formAction
+$exclude_ids = $exclude_ids ?? [];
+?>
+<h2><?= !empty($menu) ? 'Menü Öğesini Düzenle' : 'Yeni Menü Öğesi Ekle' ?></h2>
 
 <form method="post" action="<?= e($formAction) ?>">
-    <?php if ($isEdit && $menu): ?>
-        <input type="hidden" name="id" value="<?= e($menu['id']) ?>">
-    <?php endif; ?>
+  <?php if (!empty($menu)): ?>
+    <input type="hidden" name="id" value="<?= e($menu['id']) ?>">
+  <?php endif; ?>
 
-    <div>
-        <label for="parent_id">Üst Menü (Ana menü için boş bırakın):</label><br>
-        <select name="parent_id" id="parent_id">
-            <option value="">-- Ana Menü Öğesi --</option>
-            <?php if(!empty($parent_menus)): foreach ($parent_menus as $parent): ?>
-                <option value="<?= e($parent['id']) ?>" <?= (($menu['parent_id'] ?? null) == $parent['id']) ? 'selected' : '' ?>>
-                    <?= e($parent['title']) ?>
-                </option>
-            <?php endforeach; endif; ?>
-        </select>
-    </div>
-    <br>
-    <div>
-        <label for="title">Başlık:</label><br>
-        <input type="text" id="title" name="title" value="<?= e($menu['title'] ?? '') ?>" required size="50">
-    </div>
-    <br>
-    <div>
-        <label for="url">URL (örn: index.php?module=students&action=index):</label><br>
-        <input type="text" id="url" name="url" value="<?= e($menu['url'] ?? '') ?>" required size="70">
-    </div>
-    <br>
-    <div>
-        <label for="icon">İkon (örn: fa-users, isteğe bağlı):</label><br>
-        <input type="text" id="icon" name="icon" value="<?= e($menu['icon'] ?? '') ?>" size="30">
-    </div>
-    <br>
-    <div>
-        <label for="display_order">Görüntülenme Sırası:</label><br>
-        <input type="number" id="display_order" name="display_order" value="<?= e($menu['display_order'] ?? 0) ?>" style="width: 70px;">
-    </div>
-    <br>
-    <div>
-        <label>Görünecek Roller:</label><br>
-        <?php if(!empty($all_roles)): foreach ($all_roles as $role_key): ?>
-            <label style="margin-right: 10px;">
-                <input type="checkbox" name="roles[]" value="<?= e($role_key) ?>" 
-                    <?= !empty($assigned_roles) && in_array($role_key, $assigned_roles) ? 'checked' : '' ?>>
-                <?= e(ucfirst($role_key)) ?>
-            </label>
-        <?php endforeach; endif;?>
-    </div>
-    <br>
-    <div>
-        <label>
-            <input type="checkbox" name="is_active" value="1" <?= (($menu['is_active'] ?? 1) == 1) ? 'checked' : '' ?>>
-            Aktif mi?
-        </label>
-    </div>
-    <br>
-    <button type="submit"><?= $isEdit ? "Güncelle" : "Oluştur" ?></button>
-    <a href="index.php?module=menumanager&action=index" style="margin-left: 10px;">Vazgeç</a>
+  <div class="form-group">
+    <label for="parent_id">Üst Menü (sınırsız seviye):</label>
+    <select name="parent_id" id="parent_id" class="form-control" style="max-width:420px">
+      <option value="">— Ana Menü —</option>
+      <?php foreach ($parent_options as $opt):
+        $id    = (int)$opt['id'];
+        if (in_array($id, $exclude_ids, true)) continue; // kendisi ve altı listelenmesin (edit'te)
+        $depth = (int)$opt['depth'];
+        $pad   = str_repeat('— ', $depth);
+        $sel   = (!empty($menu) && (int)($menu['parent_id'] ?? 0) === $id) ? 'selected' : '';
+      ?>
+        <option value="<?= e($id) ?>" <?= $sel ?>><?= e($pad.$opt['title']) ?></option>
+      <?php endforeach; ?>
+    </select>
+    <small class="form-text text-muted">Alt/alt-alt/alt-alt-alt… oluşturmak için üst menüyü seçin.</small>
+  </div>
+
+  <div class="form-group">
+    <label for="title">Başlık:</label>
+    <input type="text" name="title" id="title" class="form-control" required
+           value="<?= e($menu['title'] ?? '') ?>" style="max-width:420px">
+  </div>
+
+  <div class="form-group">
+    <label for="url">URL (örn: <code>?module=students&action=index</code>):</label>
+    <input type="text" name="url" id="url" class="form-control"
+           value="<?= e($menu['url'] ?? '') ?>" placeholder="?module=...&action=..." style="max-width:520px">
+  </div>
+
+  <div class="form-group">
+    <label for="icon">İkon (Font Awesome sınıfı, isteğe bağlı):</label>
+    <input type="text" name="icon" id="icon" class="form-control"
+           value="<?= e($menu['icon'] ?? '') ?>" placeholder="fa-users" style="max-width:320px">
+  </div>
+
+  <div class="form-group">
+    <label for="display_order">Görüntülenme Sırası:</label>
+    <input type="number" name="display_order" id="display_order" class="form-control"
+           value="<?= e($menu['display_order'] ?? 0) ?>" style="max-width:140px">
+  </div>
+
+  <div class="form-group">
+    <label>Görünecek Roller:</label><br>
+    <?php $assigned = $assigned_roles ?? []; ?>
+    <?php foreach ($all_roles as $r): ?>
+      <label class="mr-3">
+        <input type="checkbox" name="roles[]" value="<?= e($r) ?>" <?= in_array($r, $assigned, true) ? 'checked' : '' ?>>
+        <?= e(ucfirst($r)) ?>
+      </label>
+    <?php endforeach; ?>
+  </div>
+
+  <div class="form-group form-check">
+    <input type="checkbox" class="form-check-input" id="is_active" name="is_active" value="1"
+           <?= (int)($menu['is_active'] ?? 1) === 1 ? 'checked' : '' ?>>
+    <label class="form-check-label" for="is_active">Aktif mi?</label>
+  </div>
+
+  <button type="submit" class="btn btn-primary"><?= !empty($menu) ? 'Güncelle' : 'Oluştur' ?></button>
+  <a href="index.php?module=menumanager&action=index" class="btn btn-link">Vazgeç</a>
 </form>

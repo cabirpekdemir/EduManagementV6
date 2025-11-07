@@ -1,0 +1,907 @@
+/* ============================================
+   MODERN EDU MANAGEMENT SYSTEM STYLES
+   Orta Seviye Paket - Glassmorphism & Gradients
+   ============================================ */
+
+:root {
+    /* Modern Renkler */
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --info-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    
+    --primary-color: #667eea;
+    --secondary-color: #764ba2;
+    --accent-color: #f093fb;
+    
+    --bg-light: #f8f9fc;
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --sidebar-bg: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+    
+    --text-dark: #2c3e50;
+    --text-muted: #6c757d;
+    --border-color: #e0e6ed;
+    
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+    
+    --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   GENEL STILLER
+   ============================================ */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-light);
+    color: var(--text-dark);
+}
+
+/* Smooth Scroll */
+html {
+    scroll-behavior: smooth;
+}
+
+/* ============================================
+   NAVBAR - MODERN HEADER
+   ============================================ */
+
+.main-header.navbar {
+    background: var(--primary-gradient) !important;
+    border: none;
+    box-shadow: var(--shadow-md);
+    padding: 0.75rem 1rem;
+}
+
+.main-header .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    transition: var(--transition-base);
+}
+
+.main-header .navbar-nav .nav-link:hover {
+    color: #fff !important;
+    transform: translateY(-2px);
+}
+
+.main-header .nav-link i {
+    font-size: 1.2rem;
+}
+
+/* Sayfa Başlığı */
+.current-page-title {
+    color: #fff !important;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Header Sağ Bölüm */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-name {
+    color: #fff !important;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    transition: var(--transition-base);
+}
+
+.user-name:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.logout-button {
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: var(--transition-base);
+    font-weight: 500;
+}
+
+.logout-button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+/* Bildirim Zili */
+.notifications-icon {
+    position: relative;
+    cursor: pointer;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    color: #fff;
+    transition: var(--transition-base);
+}
+
+.notifications-icon:hover {
+    transform: scale(1.1) rotate(15deg);
+}
+
+.notification-count {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #ff4757;
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+/* ============================================
+   SIDEBAR - GLASSMORPHISM
+   ============================================ */
+
+/* ============================================
+   SIDEBAR - AÇIK GRİ & ANTRASİT (TAM DÜZELTİLMİŞ)
+   ============================================ */
+
+.main-sidebar {
+    background: linear-gradient(180deg, #f5f6fa 0%, #e8eaf0 100%) !important;
+    box-shadow: var(--shadow-lg);
+}
+
+/* Logo Bölümü */
+.brand-link {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(108, 117, 125, 0.15);
+    padding: 1rem;
+    transition: var(--transition-base);
+}
+
+.brand-link:hover {
+    background: rgba(255, 255, 255, 0.95) !important;
+}
+
+.brand-text {
+    color: #2c3e50 !important; /* Koyu antrasit */
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.brand-image {
+    opacity: 1 !important;
+    border: 2px solid #2c3e50;
+}
+
+/* Kullanıcı Paneli */
+.sidebar .user-panel {
+    border-bottom: 1px solid rgba(108, 117, 125, 0.15);
+}
+
+.sidebar .user-panel .info a {
+    color: #2c3e50 !important;
+    font-weight: 500;
+    transition: var(--transition-base);
+}
+
+.sidebar .user-panel .info a:hover {
+    color: #667eea !important;
+}
+
+.sidebar .user-panel .image img {
+    border: 2px solid #2c3e50;
+}
+
+/* Sidebar Menü - Genel */
+.sidebar-menu,
+.nav-sidebar {
+    padding: 0.5rem 0;
+}
+
+/* Ana Menü Linkleri */
+.sidebar-menu > li > a,
+.nav-sidebar > .nav-item > .nav-link {
+    color: #495057 !important; /* Antrasit */
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin: 4px 8px;
+    transition: var(--transition-base);
+    display: flex;
+    align-items: center;
+}
+
+.sidebar-menu > li > a:hover,
+.nav-sidebar > .nav-item > .nav-link:hover {
+    background: rgba(102, 126, 234, 0.08) !important;
+    color: #667eea !important;
+    transform: translateX(5px);
+}
+
+/* Ana Menü İkonları */
+.sidebar-menu > li > a i,
+.nav-sidebar > .nav-item > .nav-link i {
+    color: #495057 !important;
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+    transition: var(--transition-base);
+}
+
+.sidebar-menu > li > a:hover i,
+.nav-sidebar > .nav-item > .nav-link:hover i {
+    color: #667eea !important;
+}
+
+/* Aktif Ana Menü */
+.sidebar-menu > li.active > a,
+.sidebar-menu > li.menu-open > a,
+.nav-sidebar > .nav-item.menu-open > .nav-link,
+.nav-sidebar > .nav-item > .nav-link.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: #fff !important;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
+}
+
+.sidebar-menu > li.active > a i,
+.sidebar-menu > li.menu-open > a i,
+.nav-sidebar > .nav-item.menu-open > .nav-link i,
+.nav-sidebar > .nav-item > .nav-link.active i {
+    color: #fff !important;
+}
+
+/* ============================================
+   ALT MENÜLER (CHILD) - DÜZELTİLDİ
+   ============================================ */
+
+/* 1. Seviye Alt Menü Container */
+.sidebar-menu .treeview-menu,
+.nav-sidebar .nav-treeview {
+    padding: 0.5rem 0;
+    padding-left: 1rem;
+    background: rgba(255, 255, 255, 0.4) !important;
+    border-radius: 8px;
+    margin: 4px 8px;
+}
+
+/* 1. Seviye Alt Menü Linkleri */
+.sidebar-menu .treeview-menu > li > a,
+.nav-sidebar .nav-treeview > .nav-item > .nav-link {
+    color: #5a6169 !important; /* Açık antrasit */
+    padding: 0.6rem 1rem 0.6rem 2.5rem !important;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    margin: 2px 4px;
+    transition: var(--transition-base);
+    background: transparent !important;
+}
+
+.sidebar-menu .treeview-menu > li > a:hover,
+.nav-sidebar .nav-treeview > .nav-item > .nav-link:hover {
+    background: rgba(102, 126, 234, 0.12) !important;
+    color: #667eea !important;
+    transform: translateX(5px);
+}
+
+/* 1. Seviye Alt Menü İkonları */
+.sidebar-menu .treeview-menu > li > a i,
+.nav-sidebar .nav-treeview > .nav-item > .nav-link i {
+    color: #5a6169 !important;
+    font-size: 0.95rem;
+}
+
+.sidebar-menu .treeview-menu > li > a:hover i,
+.nav-sidebar .nav-treeview > .nav-item > .nav-link:hover i {
+    color: #667eea !important;
+}
+
+/* 1. Seviye Aktif Alt Menü */
+.sidebar-menu .treeview-menu > li.active > a,
+.nav-sidebar .nav-treeview > .nav-item > .nav-link.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: #fff !important;
+    font-weight: 500;
+}
+
+.sidebar-menu .treeview-menu > li.active > a i,
+.nav-sidebar .nav-treeview > .nav-item > .nav-link.active i {
+    color: #fff !important;
+}
+
+/* ============================================
+   2. SEVİYE ALT MENÜ (CHILD OF CHILD)
+   ============================================ */
+
+/* 2. Seviye Container */
+.sidebar-menu .treeview-menu .treeview-menu,
+.nav-sidebar .nav-treeview .nav-treeview {
+    background: rgba(255, 255, 255, 0.5) !important;
+    padding-left: 1.5rem;
+    margin-left: 0.5rem;
+}
+
+/* 2. Seviye Linkler */
+.sidebar-menu .treeview-menu .treeview-menu > li > a,
+.nav-sidebar .nav-treeview .nav-treeview > .nav-item > .nav-link {
+    color: #6c757d !important; /* Daha açık antrasit */
+    padding: 0.5rem 1rem 0.5rem 2rem !important;
+    font-size: 0.85rem;
+}
+
+.sidebar-menu .treeview-menu .treeview-menu > li > a:hover,
+.nav-sidebar .nav-treeview .nav-treeview > .nav-item > .nav-link:hover {
+    background: rgba(102, 126, 234, 0.1) !important;
+    color: #667eea !important;
+}
+
+/* 2. Seviye İkonlar */
+.sidebar-menu .treeview-menu .treeview-menu > li > a i,
+.nav-sidebar .nav-treeview .nav-treeview > .nav-item > .nav-link i {
+    color: #6c757d !important;
+    font-size: 0.9rem;
+}
+
+/* 2. Seviye Aktif */
+.sidebar-menu .treeview-menu .treeview-menu > li.active > a,
+.nav-sidebar .nav-treeview .nav-treeview > .nav-item > .nav-link.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: #fff !important;
+}
+
+.sidebar-menu .treeview-menu .treeview-menu > li.active > a i,
+.nav-sidebar .nav-treeview .nav-treeview > .nav-item > .nav-link.active i {
+    color: #fff !important;
+}
+
+/* ============================================
+   3. SEVİYE VE DAHA DERİN (CHILD OF CHILD OF CHILD)
+   ============================================ */
+
+/* 3+ Seviye Container */
+.sidebar-menu .treeview-menu .treeview-menu .treeview-menu,
+.nav-sidebar .nav-treeview .nav-treeview .nav-treeview {
+    background: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* 3+ Seviye Linkler */
+.sidebar-menu .treeview-menu .treeview-menu .treeview-menu a,
+.nav-sidebar .nav-treeview .nav-treeview .nav-treeview .nav-link {
+    color: #868e96 !important; /* En açık antrasit */
+    font-size: 0.8rem;
+    padding: 0.4rem 1rem 0.4rem 1.5rem !important;
+}
+
+.sidebar-menu .treeview-menu .treeview-menu .treeview-menu a:hover,
+.nav-sidebar .nav-treeview .nav-treeview .nav-treeview .nav-link:hover {
+    color: #667eea !important;
+}
+
+/* 3+ Seviye İkonlar */
+.sidebar-menu .treeview-menu .treeview-menu .treeview-menu a i,
+.nav-sidebar .nav-treeview .nav-treeview .nav-treeview .nav-link i {
+    color: #868e96 !important;
+    font-size: 0.85rem;
+}
+
+/* ============================================
+   MENÜ OK İŞARETLERİ
+   ============================================ */
+
+.sidebar-menu .fa-angle-left,
+.nav-sidebar .right.fa-angle-left {
+    transition: transform 0.3s ease;
+    color: #495057 !important;
+    margin-left: auto;
+}
+
+/* Açık menüdeki ok */
+.sidebar-menu li.menu-open > a .fa-angle-left,
+.nav-sidebar .nav-item.menu-open > .nav-link .right {
+    transform: rotate(-90deg);
+}
+
+/* Ana menü açıkken ok beyaz */
+.sidebar-menu > li.menu-open > a .fa-angle-left,
+.nav-sidebar > .nav-item.menu-open > .nav-link .right {
+    color: #fff !important;
+}
+
+/* Alt menülerde ok rengi */
+.sidebar-menu .treeview-menu li > a .fa-angle-left,
+.nav-sidebar .nav-treeview .nav-link .right {
+    color: #5a6169 !important;
+}
+
+.sidebar-menu .treeview-menu li.menu-open > a .fa-angle-left,
+.nav-sidebar .nav-treeview .nav-item.menu-open > .nav-link .right {
+    color: #667eea !important;
+}
+
+/* ============================================
+   SCROLLBAR - ÖZEL TASARIM
+   ============================================ */
+
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(61, 68, 81, 0.25);
+    border-radius: 3px;
+    transition: background 0.3s;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(61, 68, 81, 0.4);
+}
+
+/* ============================================
+   RESPONSIVE - MOBİL
+   ============================================ */
+
+@media (max-width: 768px) {
+    .main-sidebar {
+        background: linear-gradient(180deg, #f5f6fa 0%, #e8eaf0 100%) !important;
+    }
+    
+    .sidebar-menu > li > a,
+    .nav-sidebar > .nav-item > .nav-link {
+        padding: 0.6rem 0.8rem;
+    }
+    
+    .sidebar-menu .treeview-menu > li > a,
+    .nav-sidebar .nav-treeview > .nav-item > .nav-link {
+        padding: 0.5rem 0.8rem 0.5rem 2rem !important;
+    }
+}
+
+/* ============================================
+   HOVER ANIMASYONLARI
+   ============================================ */
+
+/* Smooth hover transition */
+.sidebar-menu li a,
+.nav-sidebar .nav-link {
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar-menu li a::before,
+.nav-sidebar .nav-link::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background: #667eea;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+
+.sidebar-menu li a:hover::before,
+.nav-sidebar .nav-link:hover::before {
+    transform: translateX(0);
+}
+
+/* Aktif menüde çizgi her zaman görünsün */
+.sidebar-menu li.active > a::before,
+.sidebar-menu li.menu-open > a::before,
+.nav-sidebar .nav-link.active::before {
+    transform: translateX(0);
+    background: #fff;
+}
+/* ============================================
+   CONTENT WRAPPER - ANA İÇERİK
+   ============================================ */
+
+.content-wrapper {
+    background: var(--bg-light);
+    min-height: calc(100vh - 57px);
+    padding: 1.5rem;
+}
+
+/* ============================================
+   KARTLAR - MODERN DESIGN
+   ============================================ */
+
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    margin-bottom: 1.5rem;
+    transition: var(--transition-base);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-4px);
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 1.25rem;
+    border-radius: 12px 12px 0 0 !important;
+}
+
+.card-header h5,
+.card-header h6 {
+    margin: 0;
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+.card-footer {
+    background: transparent;
+    border-top: 1px solid var(--border-color);
+    padding: 1rem 1.25rem;
+}
+
+/* Gradient Kartlar */
+.card.gradient-primary {
+    background: var(--primary-gradient);
+    color: #fff;
+}
+
+.card.gradient-secondary {
+    background: var(--secondary-gradient);
+    color: #fff;
+}
+
+.card.gradient-success {
+    background: var(--success-gradient);
+    color: #fff;
+}
+
+/* ============================================
+   BUTONLAR - MODERN STYLE
+   ============================================ */
+
+.btn {
+    border-radius: 8px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+    transition: var(--transition-base);
+    border: none;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+    border: none;
+}
+
+.btn-success {
+    background: var(--success-gradient);
+    border: none;
+}
+
+.btn-info {
+    background: var(--info-gradient);
+    border: none;
+}
+
+.btn-sm {
+    padding: 0.4rem 1rem;
+    font-size: 0.875rem;
+}
+
+/* ============================================
+   TABLOLAR - MODERN
+   ============================================ */
+
+.table {
+    background: #fff;
+}
+
+.table thead {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.table thead th {
+    border: none;
+    color: var(--text-dark);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.table tbody tr {
+    transition: var(--transition-base);
+}
+
+.table tbody tr:hover {
+    background: rgba(102, 126, 234, 0.05);
+    transform: scale(1.01);
+}
+
+/* ============================================
+   FORM ELEMENTLERİ
+   ============================================ */
+
+.form-control,
+.form-select {
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    transition: var(--transition-base);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+/* ============================================
+   ALERT MESAJLARI
+   ============================================ */
+
+.alert {
+    border: none;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    color: #2e7d32;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    color: #c62828;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    color: #1565c0;
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    color: #ef6c00;
+}
+
+/* ============================================
+   BADGE - MODERN
+   ============================================ */
+
+.badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.8rem;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+.main-footer {
+    background: #fff;
+    border-top: 1px solid var(--border-color);
+    padding: 1rem;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* ============================================
+   DARK MODE TOGGLE (BONUS)
+   ============================================ */
+
+#darkModeToggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--primary-gradient);
+    color: #fff;
+    border: none;
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+    transition: var(--transition-base);
+    z-index: 9999;
+}
+
+#darkModeToggle:hover {
+    transform: scale(1.1) rotate(15deg);
+}
+
+/* Dark Mode Stilleri */
+body.dark-mode {
+    --bg-light: #1a1a2e;
+    --card-bg: rgba(22, 33, 62, 0.95);
+    --text-dark: #eaeaea;
+    --text-muted: #b0b0b0;
+    --border-color: #2d3748;
+}
+
+body.dark-mode .card {
+    background: var(--card-bg);
+    color: var(--text-dark);
+}
+
+body.dark-mode .table {
+    background: var(--card-bg);
+    color: var(--text-dark);
+}
+
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-dark);
+    border-color: var(--border-color);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .content-wrapper {
+        padding: 1rem;
+    }
+    
+    .card {
+        border-radius: 8px;
+    }
+    
+    .btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* ============================================
+   ANIMASYONLAR
+   ============================================ */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* Hover Glow Effect */
+.btn-primary:hover,
+.btn-success:hover,
+.btn-info:hover {
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+}
+
+/* View As Mode Banner */
+.view-as-banner {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+.view-as-banner strong {
+    font-weight: 700;
+}
+
+.view-as-banner .btn-light {
+    background: white;
+    color: #ff6b6b;
+    border: none;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.view-as-banner .btn-light:hover {
+    background: #f8f9fa;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Body padding when banner is visible */
+body.view-as-active {
+    padding-top: 50px;
+}
+
+/* View As Modal Improvements */
+.modal-lg {
+    max-width: 800px;
+}
+
+.list-group-item.view-as-user {
+    cursor: pointer;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+}
+
+.list-group-item.view-as-user:hover {
+    background-color: #f8f9fa;
+    border-left-color: #667eea;
+    transform: translateX(5px);
+}
+
+.nav-tabs .nav-link {
+    color: #495057;
+    font-weight: 500;
+}
+
+.nav-tabs .nav-link.active {
+    color: #667eea;
+    border-bottom: 2px solid #667eea;
+}
+
+/* Purple button for admin actions */
+.btn-purple {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    transition: all 0.3s;
+}
+
+.btn-purple:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* Hover effects */
+.hover-lift {
+    transition: all 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}

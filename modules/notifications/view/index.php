@@ -89,6 +89,22 @@
                                     ?>
                                 </td>
                                 <td data-label="Tarih"><small><?= htmlspecialchars(date('d.m.Y H:i', strtotime($n['created_at']))) ?></small></td>
+                                <td class="text-end">
+  <a href="index.php?module=notifications&action=show&id=<?= (int)$row['id'] ?>"
+     class="btn btn-sm btn-outline-primary me-1">Gör</a>
+
+  <a href="index.php?module=notifications&action=edit&id=<?= (int)$row['id'] ?>"
+     class="btn btn-sm btn-warning me-1">Düzenle</a>
+
+  <form action="index.php?module=notifications&action=destroy&id=<?= (int)$row['id'] ?>"
+        method="post" class="d-inline">
+    <button type="submit" class="btn btn-sm btn-danger"
+            onclick="return confirm('Bu dersi silmek istediğinize emin misiniz?');">
+      Sil
+    </button>
+  </form>
+</td>
+
                             </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>

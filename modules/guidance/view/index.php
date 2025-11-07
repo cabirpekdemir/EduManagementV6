@@ -83,3 +83,21 @@
         </table>
     </div>
 </div>
+<div class="mb-3 d-flex gap-2">
+    <?php if (($userRole ?? 'guest') === 'admin' || ($userRole ?? 'guest') === 'teacher'): ?>
+        <a href="index.php?module=guidance&action=create" class="btn btn-primary">
+            <i class="fa fa-plus"></i> Yeni Seans Ekle
+        </a>
+        <a href="index.php?module=guidance&action=appointments" class="btn btn-success">
+            <i class="fa fa-calendar-check"></i> Randevu Yönetimi
+        </a>
+    <?php endif; ?>
+    
+    <a href="index.php?module=guidance&action=requestForm" class="btn btn-info">
+        <i class="fa fa-calendar-plus"></i> Randevu Talebi
+    </a>
+    
+    <a href="index.php?module=guidance&action=myRequests" class="btn btn-outline-secondary">
+        <i class="fa fa-list"></i> Taleplerim
+    </a>
+</div>

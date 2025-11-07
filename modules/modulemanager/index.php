@@ -20,7 +20,22 @@
       <td><?= $m['id'] ?></td>
       <td><?= htmlspecialchars($m['module_name']) ?></td>
       <td><?= htmlspecialchars($m['label']) ?></td>
-      <td><?= $m['is_active'] ? '✅' : '❌' ?></td>
+       <td class="text-end">
+  <a href="index.php?module=modulemanager&action=show&id=<?= (int)$row['id'] ?>"
+     class="btn btn-sm btn-outline-primary me-1">Gör</a>
+
+  <a href="index.php?module=modulemanager&action=edit&id=<?= (int)$row['id'] ?>"
+     class="btn btn-sm btn-warning me-1">Düzenle</a>
+
+  <form action="index.php?module=modulemanager&action=destroy&id=<?= (int)$row['id'] ?>"
+        method="post" class="d-inline">
+    <button type="submit" class="btn btn-sm btn-danger"
+            onclick="return confirm('Bu dersi silmek istediğinize emin misiniz?');">
+      Sil
+    </button>
+  </form>
+</td>
+
       <td>
         <form method="POST" style="display:inline;">
           <input type="hidden" name="mod_id" value="<?= $m['id'] ?>">
