@@ -905,3 +905,9 @@ body.view-as-active {
     transform: translateY(-5px);
     box-shadow: 0 8px 16px rgba(0,0,0,0.1);
 }
+
+.modal-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 1rem);
+}
