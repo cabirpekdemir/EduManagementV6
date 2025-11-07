@@ -59,7 +59,7 @@ if (isset($_SESSION['form_ok'])): ?>
             <tr>
               <td>
                 <?php if (!empty($row['image_path'])): ?>
-                  <a href="index.php?module=activities&action=show&id=<?= (int)$row['id'] ?>">
+                  <a href="index.php?module=activities&action=view&id=<?= (int)$row['id'] ?>">
                     <img src="<?= h(BASE_URL . $row['image_path']) ?>" 
                          alt="<?= h($row['title']) ?>"
                          class="rounded"
@@ -106,7 +106,7 @@ if (isset($_SESSION['form_ok'])): ?>
               </td>
               <td class="text-end">
                 <!-- STANDART BUTONLAR -->
-                <a href="index.php?module=activities&action=show&id=<?= (int)$row['id'] ?>" 
+                <a href="index.php?module=activities&action=view&id=<?= (int)$row['id'] ?>"
                    class="btn btn-sm btn-outline-primary me-1" 
                    title="Görüntüle">
                   <i class="fa fa-eye"></i> Gör
@@ -119,7 +119,7 @@ if (isset($_SESSION['form_ok'])): ?>
                   <i class="fa fa-edit"></i> Düzenle
                 </a>
                 
-                <form action="index.php?module=activities&action=destroy" 
+                <form action="index.php?module=activities&action=delete"
                       method="post" 
                       class="d-inline"
                       onsubmit="return confirm('Bu etkinliği silmek istediğinize emin misiniz?');">

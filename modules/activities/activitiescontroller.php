@@ -364,7 +364,7 @@ class ActivitiesController
         }
     }
 
-    public function show()
+    public function view()
     {
         $id = (int)($_GET['id'] ?? 0);
         if ($id <= 0) $this->redirect('index');
@@ -390,7 +390,7 @@ class ActivitiesController
         ", [$id]) ?? [];
 
         return [
-            'view' => 'activities/view/show.php',
+            'view' => 'activities/view/view.php',
             'title' => 'Etkinlik Detay',
             'activity' => $activity,
             'classes' => $classes,
@@ -398,7 +398,7 @@ class ActivitiesController
         ];
     }
 
-    public function destroy()
+    public function delete()
     {
         if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST' || !$this->validateCsrfToken()) {
             $this->flashErr('Geçersiz istek');

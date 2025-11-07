@@ -169,7 +169,7 @@
 
 <!-- Rol Düzenleme Modal -->
 <div class="modal fade" id="editRolesModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Rolleri Düzenle</h5>
@@ -209,7 +209,7 @@
 
 <!-- Yeni Widget Modal -->
 <div class="modal fade" id="addWidgetModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Yeni Widget Ekle</h5>
@@ -330,7 +330,7 @@
 
 <!-- Widget Düzenle Modal -->
 <div class="modal fade" id="editWidgetModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Widget Düzenle</h5>
@@ -544,7 +544,7 @@ $(document).ready(function() {
         
         console.log('Updating widget:', formData);
         
-        $.post(baseUrl + '?module=dashboard&action=updateWidget',
+        $.post(baseUrl + '?module=dashboard&action=update',
             formData,
             function(response) {
                 console.log('Update response:', response);
@@ -649,7 +649,7 @@ $(document).ready(function() {
         const widgetTitle = $(this).data('widget-title');
         
         if (confirm(`"${widgetTitle}" widget'ını silmek istediğinizden emin misiniz?`)) {
-            $.post(baseUrl + '?module=dashboard&action=deleteWidget',
+            $.post(baseUrl + '?module=dashboard&action=delete',
                 {widget_id: widgetId},
                 function(response) {
                     if (response.success) {
@@ -752,7 +752,7 @@ $(document).ready(function() {
         
         console.log('Gönderilen data:', formData);
         
-        $.post(baseUrl + '?module=dashboard&action=createWidget',
+        $.post(baseUrl + '?module=dashboard&action=store',
             formData,
             function(response) {
                 if (response.success) {

@@ -110,7 +110,7 @@ class DashboardController {
     /**
      * Widget sil
      */
-    public function deleteWidget() {
+    public function delete() {
         if ($this->user['role'] !== 'admin') {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'message' => 'Yetkisiz erişim']);
@@ -138,7 +138,7 @@ class DashboardController {
     /**
      * Yeni widget oluştur
      */
-    public function createWidget() {
+    public function store() {
         if ($this->user['role'] !== 'admin') {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'message' => 'Yetkisiz erişim']);
@@ -183,7 +183,7 @@ class DashboardController {
     /**
      * Widget'ı güncelle
      */
-    public function updateWidget() {
+    public function update() {
         if ($this->user['role'] !== 'admin') {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'message' => 'Yetkisiz erişim']);
